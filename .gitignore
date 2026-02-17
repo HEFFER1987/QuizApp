@@ -16,3 +16,7 @@ DerivedData/
 # macOS
 .DS_Store
 **/.DS_Store
+
+# ignore cursor setup
+buildServer.json
+.vscode
