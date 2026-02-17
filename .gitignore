@@ -1,0 +1,18 @@
+# Xcode
+*.xcuserstate
+*.xcuserdatad/
+build/
+DerivedData/
+*.xcworkspace
+
+# ignore generated Xcode projects by XcodeGen
+/QuizApp.xcodeproj/
+/QuizApp.xcodeproj/**
+
+# ignore all SwiftGen generated files except .gitkeep
+/QuizApp/Swiftgen+Generated/*
+!/QuizApp/Swiftgen+Generated/.gitkeep
+
+# macOS
+.DS_Store
+**/.DS_Store

@@ -1,0 +1,108 @@
+name: QuizApp
+options:
+    bundleIdPrefix: my
+    deploymentTarget:
+    iOS: "26.0"
+    macOS: "14.0"
+    visionOS: "1.0"
+configs:
+    Debug: debug
+    Release: release
+targets:
+    QuizApp-iOS:
+        type: application
+        platform: iOS
+        deploymentTarget: "26.0"
+        sources:
+          - path: QuizApp/iOS
+          - path: QuizApp/Shared
+          - path: QuizApp/Swiftgen+Generated
+            createIntermediateGroups: true
+        preBuildScripts:
+          - name: "Run Swiftgen script"
+            script: |
+              echo "Running a Swiftgen script!"
+              if which swiftgen >/dev/null; then
+                swiftgen
+              else
+                echo "warning: SwiftGen not found. Install with Homebrew or ensure it's in your PATH."
+              fi
+            basedOnDependencyAnalysis: false # Optional: Set to true if the script depends on build analysis
+            showEnvVars: false # Optional: Set to true to show environment variables in the script's output
+          - name: "Run SwiftLint script"
+            script: |
+                echo "Running a SwiftLint script!"
+                if command -v swiftlint >/dev/null 2>&1; then
+                    swiftlint
+                else
+                    echo "warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions."
+                fi
+            basedOnDependencyAnalysis: false # Optional: Set to true if the script depends on build analysis
+            showEnvVars: false # Optional: Set to true to show environment variables in the script's output
+        settings:
+            base:
+                INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.education"
+                GENERATE_INFOPLIST_FILE: YES
+                CLANG_CXX_LANGUAGE_STANDARD: gnu++20
+                GCC_C_LANGUAGE_STANDARD: gnu17
+    QuizApp-macOS:
+        type: application
+        platform: macOS
+        deploymentTarget: "15.7"
+        sources:
+          - path: QuizApp/macOS
+          - path: QuizApp/Shared
+          - path: QuizApp/Swiftgen+Generated
+            createIntermediateGroups: true
+        preBuildScripts:
+          - name: "Run Swiftgen script"
+            script: |
+              echo "Running a Swiftgen script!"
+              if which swiftgen >/dev/null; then
+                swiftgen
+              else
+                echo "warning: SwiftGen not found. Install with Homebrew or ensure it's in your PATH."
+              fi
+            basedOnDependencyAnalysis: false # Optional: Set to true if the script depends on build analysis
+            showEnvVars: false # Optional: Set to true to show environment variables in the script's output
+          - name: "Run SwiftLint script"
+            script: |
+                echo "Running a SwiftLint script!"
+                if command -v swiftlint >/dev/null 2>&1; then
+                    swiftlint
+                else
+                    echo "warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions."
+                fi
+            basedOnDependencyAnalysis: false # Optional: Set to true if the script depends on build analysis
+            showEnvVars: false # Optional: Set to true to show environment variables in the script's output
+        settings:
+            base:
+                INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.education"
+                GENERATE_INFOPLIST_FILE: YES
+                CLANG_CXX_LANGUAGE_STANDARD: gnu++20
+                GCC_C_LANGUAGE_STANDARD: gnu17
+    QuizAppTests:
+        type: bundle.unit-test
+        platform: iOS
+        deploymentTarget: "16.0"
+        sources: [QuizAppTests]
+        dependencies:
+            - target: QuizApp-iOS
+            
+        settings:
+            base:
+                GENERATE_INFOPLIST_FILE: YES
+        
+    
+    QuizAppUITests:
+        type: bundle.ui-testing
+        platform: iOS
+        deploymentTarget: "16.0"
+        sources: [QuizAppUITests]
+        dependencies:
+            - target: QuizApp-iOS
+        
+        settings:
+            base:
+                GENERATE_INFOPLIST_FILE: YES
+        
