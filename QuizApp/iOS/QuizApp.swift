@@ -6,12 +6,16 @@
 //
 
 import SwiftUI
+import SUICoordinator
 
 @main
 struct QuizAppApp: App {
+
+    let coordinator: Coordinator = LaunchCoordinatorImpl()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            coordinator.getView()
         }
     }
 }

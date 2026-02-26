@@ -8,6 +8,10 @@ options:
 configs:
     Debug: debug
     Release: release
+packages:
+    SUICoordinator:
+        url: https://github.com/felilo/SUICoordinator
+        from: 1.0.0
 targets:
     QuizApp-iOS:
         type: application
@@ -18,6 +22,8 @@ targets:
           - path: QuizApp/Shared
           - path: QuizApp/Swiftgen+Generated
             createIntermediateGroups: true
+        dependencies:
+            - package: SUICoordinator
         preBuildScripts:
           - name: "Run Swiftgen script"
             script: |
@@ -45,6 +51,7 @@ targets:
                 GENERATE_INFOPLIST_FILE: YES
                 CLANG_CXX_LANGUAGE_STANDARD: gnu++20
                 GCC_C_LANGUAGE_STANDARD: gnu17
+
     QuizApp-macOS:
         type: application
         platform: macOS
@@ -54,6 +61,8 @@ targets:
           - path: QuizApp/Shared
           - path: QuizApp/Swiftgen+Generated
             createIntermediateGroups: true
+        dependencies:
+            - package: SUICoordinator
         preBuildScripts:
           - name: "Run Swiftgen script"
             script: |
@@ -81,6 +90,7 @@ targets:
                 GENERATE_INFOPLIST_FILE: YES
                 CLANG_CXX_LANGUAGE_STANDARD: gnu++20
                 GCC_C_LANGUAGE_STANDARD: gnu17
+                
     QuizAppTests:
         type: bundle.unit-test
         platform: iOS
@@ -88,12 +98,10 @@ targets:
         sources: [QuizAppTests]
         dependencies:
             - target: QuizApp-iOS
-            
         settings:
             base:
                 GENERATE_INFOPLIST_FILE: YES
-        
-    
+                
     QuizAppUITests:
         type: bundle.ui-testing
         platform: iOS
