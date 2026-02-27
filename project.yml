@@ -12,6 +12,9 @@ packages:
     SUICoordinator:
         url: https://github.com/felilo/SUICoordinator
         from: 1.0.0
+    Firebase:
+        url: https://github.com/firebase/firebase-ios-sdk
+        from: 12.10.0
 targets:
     QuizApp-iOS:
         type: application
@@ -24,6 +27,8 @@ targets:
             createIntermediateGroups: true
         dependencies:
             - package: SUICoordinator
+            - package: Firebase
+              product: FirebaseCore
         preBuildScripts:
           - name: "Run Swiftgen script"
             script: |
@@ -43,6 +48,17 @@ targets:
                 else
                     echo "warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions."
                 fi
+            basedOnDependencyAnalysis: false # Optional: Set to true if the script depends on build analysis
+            showEnvVars: false # Optional: Set to true to show environment variables in the script's output
+          - name: "Run Firebase plist file script"
+            script: |
+              echo "Running a Firebase plist script"
+              # Determine which file to copy based on the build configuration
+              if [ "${CONFIGURATION}" == "Release" ]; then
+                  cp "${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Prod.plist" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist"
+              else
+                  cp "${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Dev.plist" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist"
+              fi
             basedOnDependencyAnalysis: false # Optional: Set to true if the script depends on build analysis
             showEnvVars: false # Optional: Set to true to show environment variables in the script's output
         settings:
@@ -63,6 +79,8 @@ targets:
             createIntermediateGroups: true
         dependencies:
             - package: SUICoordinator
+            - package: Firebase
+              product: FirebaseCore
         preBuildScripts:
           - name: "Run Swiftgen script"
             script: |
@@ -82,6 +100,17 @@ targets:
                 else
                     echo "warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions."
                 fi
+            basedOnDependencyAnalysis: false # Optional: Set to true if the script depends on build analysis
+            showEnvVars: false # Optional: Set to true to show environment variables in the script's output
+          - name: "Run Firebase plist file script"
+            script: |
+              echo "Running a Firebase plist script"
+              # Determine which file to copy based on the build configuration
+              if [ "${CONFIGURATION}" == "Release" ]; then
+                  cp "${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Prod.plist" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist"
+              else
+                  cp "${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Dev.plist" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist"
+              fi
             basedOnDependencyAnalysis: false # Optional: Set to true if the script depends on build analysis
             showEnvVars: false # Optional: Set to true to show environment variables in the script's output
         settings:

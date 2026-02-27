@@ -7,10 +7,26 @@
 
 import SwiftUI
 import SUICoordinator
+import FirebaseCore
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+  func application(_ application: UIApplication,
+                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    FirebaseApp.configure()
+    if let options = FirebaseApp.app()?.options {
+        print("Firebase Project ID: \(options.projectID ?? "unknown")")
+        print("Firebase Bundle ID: \(Bundle.main.bundleIdentifier ?? "unknown")")
+    }
+    return true
+  }
+}
 
 @main
 struct QuizAppApp: App {
 
+    // register app delegate for Firebase setup
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
     let coordinator: Coordinator = LaunchCoordinatorImpl()
 
     var body: some Scene {
