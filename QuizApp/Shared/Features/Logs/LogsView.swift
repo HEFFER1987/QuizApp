@@ -11,7 +11,7 @@ struct LogsView<ViewModel: LogsViewModel>: View {
     var body: some View {
         ZStack {
             Color.red
-            Text("Logs view")
+            Text("logs.title")
         }
     }
 }

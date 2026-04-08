@@ -15,6 +15,9 @@ packages:
     Firebase:
         url: https://github.com/firebase/firebase-ios-sdk
         from: 12.10.0
+    GoogleSignIn:
+        url: https://github.com/google/GoogleSignIn-iOS
+        from: 8.0.0
 targets:
     QuizApp-iOS:
         type: application
@@ -25,10 +28,15 @@ targets:
           - path: QuizApp/Shared
           - path: QuizApp/Swiftgen+Generated
             createIntermediateGroups: true
+        resources:
+          - path: QuizApp/Shared/Resources
         dependencies:
             - package: SUICoordinator
             - package: Firebase
               product: FirebaseCore
+            - package: GoogleSignIn
+              product: GoogleSignIn
+              product: GoogleSignInSwift
         preBuildScripts:
           - name: "Run Swiftgen script"
             script: |
@@ -124,10 +132,15 @@ targets:
           - path: QuizApp/Shared
           - path: QuizApp/Swiftgen+Generated
             createIntermediateGroups: true
+        resources:
+          - path: QuizApp/Shared/Resources
         dependencies:
             - package: SUICoordinator
             - package: Firebase
               product: FirebaseCore
+            - package: GoogleSignIn
+              product: GoogleSignIn
+              product: GoogleSignInSwift
         preBuildScripts:
           - name: "Run Swiftgen script"
             script: |

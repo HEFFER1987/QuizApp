@@ -10,11 +10,14 @@ struct LaunchView<ViewModel: LaunchViewModel>: View {
 
     var body: some View {
         ZStack {
-            Color.white
-                .ignoresSafeArea()
+            
+            CommonBackgroundView()
 
             ProgressView()
                 .progressViewStyle(.circular)
+                .tint(.white)
+                .controlSize(.large)
+                .scaleEffect(1.6)
 
             Color.clear
                 .contentShape(Rectangle())
@@ -24,6 +27,16 @@ struct LaunchView<ViewModel: LaunchViewModel>: View {
                         await viewModel.trippleTap()
                     }
                 }
+             .onAppear(perform: {
+                 Task {
+                     await viewModel.startTimer()
+                 }
+              })
         }
+        .ignoresSafeArea()
     }
+}
+
+#Preview {
+    LaunchView(viewModel: LaunchViewModelImpl(coordinator: LaunchCoordinatorImpl()))
 }

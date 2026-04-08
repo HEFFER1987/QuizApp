@@ -1,33 +1,33 @@
 import Foundation
 
-/// Простой синглтон-логгер, который пишет логи в текстовые файлы по дате.
+/// A simple singleton logger that writes date-based log files.
 final class Logger {
     static let shared = Logger()
 
     private let queue = DispatchQueue(label: "quizapp.logger.queue", qos: .background)
     private let fileManager = FileManager.default
 
-    /// Конфигурация хранения логов.
-    /// Можно ограничить по количеству дней и/или по количеству файлов.
+    /// Log retention configuration.
+    /// You can limit by number of days and/or number of files.
     struct Retention {
-        /// Сколько последних дней хранить логи. `nil` — без ограничения по дням.
+        /// How many most recent days to keep logs. `nil` means no day-based limit.
         let maxDays: Int?
-        /// Сколько последних файлов хранить. `nil` — без ограничения по количеству файлов.
+        /// How many most recent files to keep. `nil` means no file-count limit.
         let maxFiles: Int?
 
         static let `default` = Retention(maxDays: 7, maxFiles: 50)
     }
 
-    /// Текущая конфигурация хранения логов.
-    /// Можно переопределить из приложения: `Logger.shared.retention = ...`
+    /// Current log retention configuration.
+    /// Can be overridden from the app: `Logger.shared.retention = ...`
     var retention: Retention = .default
 
     private init() {}
 
     // MARK: - Public API
 
-    /// Записать строку в лог.
-    /// Файл лога выбирается по текущей дате (один или несколько файлов на день).
+    /// Writes a log entry.
+    /// The log file is chosen by current date (one or multiple files per day).
     func log(
         _ message: String,
         level: LogLevel = .info,
@@ -47,7 +47,7 @@ final class Logger {
             message: message
         )
 
-        // Строка для вывода в консоль (человекочитаемый формат)
+        // Console string (human-readable format)
         let timestamp = Self.timestampFormatter.string(from: now)
         let consoleString =
         """
@@ -56,17 +56,17 @@ final class Logger {
 
         """
 
-        // Строка для файла (одна JSON-запись на строку — удобно парсить в приложении)
+        // File string (one JSON record per line — convenient for parsing)
         let fileString: String
         if let data = try? Self.jsonEncoder.encode(entry),
            let json = String(data: data, encoding: .utf8) {
             fileString = json + "\n"
         } else {
-            // На случай ошибки кодирования — запасной текстовый формат
+            // Fallback text format if encoding fails
             fileString = consoleString
         }
 
-        // Дублируем в консоль для удобства
+        // Also print to console in DEBUG for convenience
         #if DEBUG
         print(consoleString, terminator: "")
         #endif
@@ -83,7 +83,7 @@ final class Logger {
 
         do {
             if !fileManager.fileExists(atPath: url.path) {
-                // Создаём пустой файл, если его ещё нет
+                // Create an empty file if it doesn't exist yet
                 let directory = url.deletingLastPathComponent()
                 if !fileManager.fileExists(atPath: directory.path) {
                     try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -101,7 +101,7 @@ final class Logger {
                 try handle.write(contentsOf: data)
             }
 
-            // После успешной записи — подчистим старые файлы
+            // After a successful write, clean up old files
             try cleanupIfNeeded(in: url.deletingLastPathComponent())
         } catch {
             #if DEBUG
@@ -110,7 +110,7 @@ final class Logger {
         }
     }
 
-    /// Удаляет старые лог-файлы согласно настройкам `retention`.
+    /// Deletes old log files according to `retention`.
     private func cleanupIfNeeded(in logsDirectory: URL) throws {
         let hasDaysLimit = retention.maxDays != nil
         let hasFilesLimit = retention.maxFiles != nil
@@ -125,7 +125,7 @@ final class Logger {
             options: [.skipsHiddenFiles]
         )
 
-        // Фильтруем только наши лог-файлы
+        // Filter only our log files
         let logFiles = allFiles.filter { $0.lastPathComponent.hasPrefix("log_") && $0.pathExtension == "txt" }
         guard !logFiles.isEmpty else { return }
 
@@ -137,12 +137,12 @@ final class Logger {
             filesWithDates.append((url, date))
         }
 
-        // Сортируем по дате (от самых старых к новым)
+        // Sort by date (oldest to newest)
         filesWithDates.sort { $0.date < $1.date }
 
         var filesToDelete = Set<URL>()
 
-        // Ограничение по дням
+        // Day-based limit
         if let maxDays = retention.maxDays {
             let calendar = Calendar.current
             let now = Date()
@@ -154,14 +154,14 @@ final class Logger {
             }
         }
 
-        // Ограничение по количеству файлов
+        // File-count limit
         if let maxFiles = retention.maxFiles, filesWithDates.count > maxFiles {
             let overflow = filesWithDates.count - maxFiles
             let oldestToDelete = filesWithDates.prefix(overflow).map { $0.url }
             oldestToDelete.forEach { filesToDelete.insert($0) }
         }
 
-        // Удаляем
+        // Delete
         for url in filesToDelete {
             try? fileManager.removeItem(at: url)
         }
@@ -191,18 +191,18 @@ final class Logger {
                     url.pathExtension == fileExtension
                 }
             } catch {
-                // Если не удалось прочитать директорию, просто начнём новый файл
+                // If the directory can't be read, just start a new file
                 todaysFiles = []
             }
         }
 
-        // Если файлов за сегодня ещё нет — создаём первый
+        // If there are no files for today yet, create the first one
         if todaysFiles.isEmpty {
             let fileName = String(format: "%@_%02d.%@", baseName, 1, fileExtension)
             return logsDirectory.appendingPathComponent(fileName)
         }
 
-        // Находим файл с максимальным индексом
+        // Find the file with the highest index
         var latestFile = todaysFiles[0]
         var maxIndex = logFileIndex(from: latestFile, baseName: baseName)
 
@@ -214,22 +214,22 @@ final class Logger {
             }
         }
 
-        // Проверяем размер последнего файла
+        // Check the size of the latest file
         do {
             let resourceValues = try latestFile.resourceValues(forKeys: [.fileSizeKey])
             let fileSize = Int64(resourceValues.fileSize ?? 0)
 
             if fileSize >= Self.maxFileSizeBytes {
-                // Текущий файл переполнен — создаём следующий
+                // Current file is full — create the next one
                 let nextIndex = max(maxIndex, 1) + 1
                 let fileName = String(format: "%@_%02d.%@", baseName, nextIndex, fileExtension)
                 return logsDirectory.appendingPathComponent(fileName)
             } else {
-                // Продолжаем писать в существующий файл
+                // Keep writing to the existing file
                 return latestFile
             }
         } catch {
-            // В случае ошибки просто создаём новый файл
+            // On error, just create a new file
             let nextIndex = max(maxIndex, 1) + 1
             let fileName = String(format: "%@_%02d.%@", baseName, nextIndex, fileExtension)
             return logsDirectory.appendingPathComponent(fileName)
@@ -269,7 +269,7 @@ final class Logger {
     private func logFileIndex(from url: URL, baseName: String) -> Int {
         let name = url.deletingPathExtension().lastPathComponent
 
-        // Поддержка старого формата имени "log_YYYY-MM-DD.txt"
+        // Support legacy name format: "log_YYYY-MM-DD.txt"
         guard name != baseName else { return 1 }
 
         let prefix = baseName + "_"
@@ -281,8 +281,8 @@ final class Logger {
 
     // MARK: - Parsing
 
-    /// Распарсить JSON-логи из файла в массив `LogEntry`.
-    /// Ожидается формат "одна JSON-запись на строку".
+    /// Parses JSON logs from a file into an array of `LogEntry`.
+    /// Expected format: "one JSON record per line".
     static func parseLogFile(at url: URL) -> [LogEntry] {
         guard
             let data = try? Data(contentsOf: url),

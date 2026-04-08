@@ -2,6 +2,7 @@ import Foundation
 
 protocol LaunchViewModel: ObservableObject {
     func trippleTap() async
+    func startTimer() async
 }
 
 class LaunchViewModelImpl: LaunchViewModel {
@@ -10,6 +11,17 @@ class LaunchViewModelImpl: LaunchViewModel {
 
     init (coordinator: LaunchCoordinator) {
         self.coordinator = coordinator
+    }
+
+    @MainActor func startTimer() async {
+        Task {
+            do {
+                try await Task.sleep(for: .seconds(3))
+                await coordinator.showLogin()
+            } catch {
+                print("Error starting timer: \(error)")
+            }
+        }
     }
 
     @MainActor func trippleTap() async {

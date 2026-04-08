@@ -31,7 +31,12 @@ struct QuizAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            coordinator.getView()
+            ZStack {
+                // Тот же цвет, что на Launch Screen
+                CommonBackgroundView()
+                
+                coordinator.getView()
+            }
         }
     }
 }

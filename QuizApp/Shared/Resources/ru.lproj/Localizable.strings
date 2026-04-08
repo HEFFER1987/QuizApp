@@ -1,0 +1,11 @@
+"login.welcome.title" = "С возвращением!";
+"login.email.placeholder" = "Эл. почта";
+"login.password.placeholder" = "Пароль";
+"login.action.login" = "Войти";
+"login.action.signup" = "Регистрация";
+"login.google.button" = "Войти через Google";
+"login.password.hide" = "Скрыть пароль";
+"login.password.show" = "Показать пароль";
+
+"logs.title" = "Логи";
+

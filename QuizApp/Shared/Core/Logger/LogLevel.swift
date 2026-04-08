@@ -7,7 +7,7 @@ enum LogLevel: Codable, Equatable {
     case error
     case custom(String)
 
-    /// Строковое представление уровня (то, что попадает в JSON и в логи).
+    /// String representation of the level (used in JSON and logs).
     var rawValue: String {
         switch self {
         case .debug: return "DEBUG"
