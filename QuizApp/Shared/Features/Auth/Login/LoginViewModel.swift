@@ -6,7 +6,7 @@ protocol LoginViewModel: ObservableObject {
     var password: String { get set }
 
     func login()
-    func signUp()
+    func signUp() async
     func loginWithApple(result: Result<ASAuthorization, any Error>)
     func loginWithGoogle()
 }
@@ -25,8 +25,8 @@ class LoginViewModelImpl: LoginViewModel {
 
     }
 
-    func signUp() {
-
+    @MainActor func signUp() async {
+        await coordinator.showSignUp()
     }
 
     func loginWithApple(result: Result<ASAuthorization, any Error>) {
@@ -34,6 +34,6 @@ class LoginViewModelImpl: LoginViewModel {
     }
 
     func loginWithGoogle() {
-        
+
     }
 }

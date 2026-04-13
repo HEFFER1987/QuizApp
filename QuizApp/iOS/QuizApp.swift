@@ -26,15 +26,14 @@ struct QuizAppApp: App {
 
     // register app delegate for Firebase setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    
+
     let coordinator: Coordinator = LaunchCoordinatorImpl()
 
     var body: some Scene {
         WindowGroup {
             ZStack {
-                // Тот же цвет, что на Launch Screen
                 CommonBackgroundView()
-                
+
                 coordinator.getView()
             }
         }

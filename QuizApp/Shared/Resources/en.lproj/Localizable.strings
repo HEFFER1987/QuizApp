@@ -1,11 +1,19 @@
 "login.welcome.title" = "Welcome Back!";
-"login.email.placeholder" = "Email";
-"login.password.placeholder" = "Password";
+//"login.email.placeholder" = "Email";
+//"login.password.placeholder" = "Password";
 "login.action.login" = "Login";
-"login.action.signup" = "Sign Up";
+//"login.action.signup" = "Sign Up";
 "login.google.button" = "Sign in with Google";
 "login.password.hide" = "Hide password";
 "login.password.show" = "Show password";
 
 "logs.title" = "Logs";
 
+"signup.create.title" = "Create account";
+"signup.confirm.password.placeholder" = "Confirm password";
+"signup.action.back" = "Already have an account? Log in";
+"signup.google.button" = "Sign up with Google";
+
+"common.email.placeholder" = "Email";
+"common.password.placeholder" = "Password";
+"common.action.signup" = "Sign Up";

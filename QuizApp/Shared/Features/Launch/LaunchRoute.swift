@@ -11,14 +11,15 @@ enum LaunchRoute: RouteType {
         .custom(transition: .identity, animation: .default, fullScreen: true)
     }
 
+    @ViewBuilder
     var body: some View {
         switch self {
-            case .main(let coordinator): 
-                LaunchView(viewModel: LaunchViewModelImpl(coordinator: coordinator))
-            case .login(let coordinator):
-                LoginView(viewModel: LoginViewModelImpl(coordinator: coordinator))
-            case .logs(let coordinator):
-                LogsView(viewModel: LogsViewModelImpl(coordinator: coordinator))
+        case .main(let coordinator):
+            LaunchView(viewModel: LaunchViewModelImpl(coordinator: coordinator))
+        case .login(let coordinator):
+            LoginView(viewModel: LoginViewModelImpl(coordinator: coordinator))
+        case .logs(let coordinator):
+            LogsView(viewModel: LogsViewModelImpl(coordinator: coordinator))
         }
     }
 }
