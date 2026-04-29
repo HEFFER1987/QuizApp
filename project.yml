@@ -127,6 +127,7 @@ targets:
                 CURRENT_PROJECT_VERSION: 1.0
                 MARKETING_VERSION: 1.0
                 CODE_SIGN_ENTITLEMENTS: QuizApp/iOS/QuizApp-iOS.entitlements
+                INFOPLIST_FILE: QuizApp/iOS/QuizApp-iOS-Info.plist
     QuizApp-macOS:
         type: application
         platform: macOS

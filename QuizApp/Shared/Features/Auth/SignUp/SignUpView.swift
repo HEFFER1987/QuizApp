@@ -93,9 +93,7 @@ struct SignUpView<ViewModel: SignUpViewModel>: View {
                     background: .black,
                     foreground: .white
                 ) {
-                    Task {
-                        await viewModel.login()
-                    }
+                    viewModel.login()
                 }
             }
             .padding(.horizontal, 20)

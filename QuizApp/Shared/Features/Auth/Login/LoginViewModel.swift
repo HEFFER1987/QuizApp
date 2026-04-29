@@ -7,6 +7,8 @@ enum LoginError: Error {
     case appleIDCredentialEmpty
     case rawNonceEmpty
     case idTokenEmpty
+    case accessTokenEmpty
+    case googleConfigurationMissing
     case authentificationService(error: Error)
     case firebase(error: Error)
 }
@@ -16,40 +18,43 @@ protocol LoginViewModel: ObservableObject {
     var password: String { get set }
 
     func login()
-    func signUp() async
+    func signUp()
     func loginWithApple(result: Result<ASAuthorization, any Error>)
     func loginWithGoogle()
 }
 
-class LoginViewModelImpl: LoginViewModel {
+final class LoginViewModelImpl: AuthViewModelBase, LoginViewModel {
 
     let coordinator: LoginCoordinator
-    private let authManager: AuthManager
 
-    @Published var email: String = ""
-    @Published var password: String = ""
     @Published var error: LoginError?
-    @Published var isLoading: Bool = false
 
-    init (
+    init(
         coordinator: LoginCoordinator,
-        authManager: AuthManager = AuthManagerImp()
-        ) {
+        authManager: AuthManager = AuthManagerImp(),
+        googleSignInProvider: GoogleSignInProviding = GoogleSignInProvider(),
+        presentingViewControllerProvider: PresentingViewControllerProviding =
+            UIApplicationPresentingViewControllerProvider()
+    ) {
         self.coordinator = coordinator
-        self.authManager = authManager
+        super.init(
+            authManager: authManager,
+            googleSignInProvider: googleSignInProvider,
+            presentingViewControllerProvider: presentingViewControllerProvider
+        )
     }
 
     func login() {
         let email = self.email.trimmingCharacters(in: .whitespacesAndNewlines)
         let password = self.password
 
-        guard !email.isEmpty else { 
+        guard !email.isEmpty else {
             self.error = .emailEmpty
-            return 
+            return
         }
-        guard !password.isEmpty else { 
+        guard !password.isEmpty else {
             self.error = .passwordEmpty
-            return 
+            return
         }
         self.isLoading = true
         defer {
@@ -63,11 +68,13 @@ class LoginViewModelImpl: LoginViewModel {
                 Logger.shared.log("Firebase sign in failed: \(error)", level: .error)
                 self.error = .firebase(error: error)
             }
-        }   
+        }
     }
 
-    @MainActor func signUp() async {
-        await coordinator.showSignUp()
+    func signUp() {
+        Task { @MainActor in
+            await coordinator.showSignUp()
+        }
     }
 
     func loginWithApple(result: Result<ASAuthorization, any Error>) {
@@ -77,20 +84,18 @@ class LoginViewModelImpl: LoginViewModel {
 
         switch result {
         case .success(let authorization):
-            guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else { 
+            guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
                 self.error = .appleIDCredentialEmpty
                 return
             }
-            guard let idToken = appleIDCredential.identityToken else { 
+            guard let idToken = appleIDCredential.identityToken else {
                 self.error = .appleIDCredentialEmpty
                 return
             }
-            guard let rawNonce = appleIDCredential.authorizationCode else { 
+            guard let rawNonce = appleIDCredential.authorizationCode else {
                 self.error = .appleIDCredentialEmpty
                 return
             }
-        
-
             let idTokenString = String(data: idToken, encoding: .utf8) ?? ""
             let rawNonceString = String(data: rawNonce, encoding: .utf8) ?? ""
 
@@ -99,7 +104,7 @@ class LoginViewModelImpl: LoginViewModel {
                     _ = try await authManager.signIn(method: .apple(idToken: idTokenString, rawNonce: rawNonceString))
                 } catch {
                     Logger.shared.log("Firebase sign in with Apple failed: \(error)", level: .error)
-                    self.error = .firebase(error: error)
+                    await MainActor.run { self.error = .firebase(error: error) }
                 }
             }
         case .failure(let error):
@@ -109,6 +114,49 @@ class LoginViewModelImpl: LoginViewModel {
     }
 
     func loginWithGoogle() {
+        Task {
+            await MainActor.run {
+                self.isLoading = true
+                self.error = nil
+            }
+            defer {
+                Task { @MainActor in
+                    self.isLoading = false
+                }
+            }
 
+            do {
+                let tokens = try await googleSignInTokens()
+                _ = try await authManager.signIn(
+                    method: .google(idToken: tokens.idToken, accessToken: tokens.accessToken)
+                )
+            } catch let googleError as GoogleSignInError {
+                Logger.shared.log("Google sign-in failed: \(googleError)", level: .error)
+                await MainActor.run { self.error = googleError.toLoginError }
+            } catch let loginError as LoginError {
+                Logger.shared.log("Login with Google failed: \(loginError)", level: .error)
+                await MainActor.run { self.error = loginError }
+            } catch {
+                Logger.shared.log("Login with Google failed: \(error)", level: .error)
+                await MainActor.run { self.error = .firebase(error: error) }
+            }
+        }
+    }
+}
+
+private extension GoogleSignInError {
+    var toLoginError: LoginError {
+        switch self {
+        case .configurationMissing:
+            return .googleConfigurationMissing
+        case .noPresentingViewController:
+            return .authentificationService(error: self)
+        case .idTokenEmpty:
+            return .idTokenEmpty
+        case .accessTokenEmpty:
+            return .accessTokenEmpty
+        case .underlying(let error):
+            return .authentificationService(error: error)
+        }
     }
 }
