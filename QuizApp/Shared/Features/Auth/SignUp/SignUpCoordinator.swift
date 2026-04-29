@@ -20,4 +20,8 @@ class SignUpCoordinatorImpl: Coordinator<DefaultRoute>, SignUpCoordinator {
     func moveBackToLogin() async {
         await finishFlow(animated: true)
     }
+
+    func singup() async {
+        
+    }
 }
