@@ -33,11 +33,13 @@ targets:
         dependencies:
             - package: SUICoordinator
             - package: Firebase
-              product: FirebaseCore
-              product: FirebaseAuth
+              products:
+                - FirebaseCore
+                - FirebaseAuth
             - package: GoogleSignIn
-              product: GoogleSignIn
-              product: GoogleSignInSwift
+              products:
+                - GoogleSignIn
+                - GoogleSignInSwift
         preBuildScripts:
           - name: "Run Swiftgen script"
             script: |
@@ -55,22 +57,28 @@ targets:
                 if command -v swiftlint >/dev/null 2>&1; then
                     swiftlint
                 else
-                    echo "warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions."
+                    echo "warning: swiftlint command not found - See https://github.com/realm/SwiftLint#installation for installation instructions."
                 fi
             basedOnDependencyAnalysis: false # Optional: Set to true if the script depends on build analysis
             showEnvVars: false # Optional: Set to true to show environment variables in the script's output
+        postBuildScripts:
           - name: "Run Firebase plist file script"
             script: |
               echo "Running a Firebase plist script"
-              # Determine which file to copy based on the build configuration
+              PLIST_DEST="${TARGET_BUILD_DIR}/${UNWRAPPED_PRODUCT_NAME}.app/GoogleService-Info.plist"
               if [ "${CONFIGURATION}" == "Release" ]; then
-                  cp "${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Prod.plist" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist"
+                SOURCE="${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Prod.plist"
               else
-                  cp "${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Dev.plist" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist"
+                SOURCE="${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Dev.plist"
               fi
-            basedOnDependencyAnalysis: false # Optional: Set to true if the script depends on build analysis
-            showEnvVars: false # Optional: Set to true to show environment variables in the script's output
-        postBuildScripts:
+              if [ ! -f "${SOURCE}" ]; then
+                echo "error: Firebase config not found at ${SOURCE}"
+                exit 1
+              fi
+              mkdir -p "$(dirname "${PLIST_DEST}")"
+              cp "${SOURCE}" "${PLIST_DEST}"
+            basedOnDependencyAnalysis: false
+            showEnvVars: false
           - name: "Set build number and date"
             script: |
               echo "Setting build number and build date in Info.plist"
@@ -142,11 +150,13 @@ targets:
         dependencies:
             - package: SUICoordinator
             - package: Firebase
-              product: FirebaseCore
-              product: FirebaseAuth
+              products:
+                - FirebaseCore
+                - FirebaseAuth
             - package: GoogleSignIn
-              product: GoogleSignIn
-              product: GoogleSignInSwift
+              products:
+                - GoogleSignIn
+                - GoogleSignInSwift
         preBuildScripts:
           - name: "Run Swiftgen script"
             script: |
@@ -164,22 +174,28 @@ targets:
                 if command -v swiftlint >/dev/null 2>&1; then
                     swiftlint
                 else
-                    echo "warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions."
+                    echo "warning: swiftlint command not found - See https://github.com/realm/SwiftLint#installation for installation instructions."
                 fi
             basedOnDependencyAnalysis: false # Optional: Set to true if the script depends on build analysis
             showEnvVars: false # Optional: Set to true to show environment variables in the script's output
+        postBuildScripts:
           - name: "Run Firebase plist file script"
             script: |
               echo "Running a Firebase plist script"
-              # Determine which file to copy based on the build configuration
+              PLIST_DEST="${TARGET_BUILD_DIR}/${UNWRAPPED_PRODUCT_NAME}.app/GoogleService-Info.plist"
               if [ "${CONFIGURATION}" == "Release" ]; then
-                  cp "${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Prod.plist" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist"
+                SOURCE="${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Prod.plist"
               else
-                  cp "${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Dev.plist" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist"
+                SOURCE="${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Dev.plist"
               fi
-            basedOnDependencyAnalysis: false # Optional: Set to true if the script depends on build analysis
-            showEnvVars: false # Optional: Set to true to show environment variables in the script's output
-        postBuildScripts:
+              if [ ! -f "${SOURCE}" ]; then
+                echo "error: Firebase config not found at ${SOURCE}"
+                exit 1
+              fi
+              mkdir -p "$(dirname "${PLIST_DEST}")"
+              cp "${SOURCE}" "${PLIST_DEST}"
+            basedOnDependencyAnalysis: false
+            showEnvVars: false
           - name: "Set build number and date"
             script: |
               echo "Setting build number and build date in Info.plist"
