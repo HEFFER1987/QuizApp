@@ -1,0 +1,11 @@
+---
+description: Swift Concurrency conventions for this project
+alwaysApply: true
+---
+
+# Swift Concurrency
+
+- Use `async/await`, `Task`, `TaskGroup`, and `Actor`; do not introduce completion-handler-based APIs.
+- Check cancellation in long-running or loop-based work (`Task.isCancelled`, `try Task.checkCancellation()`).
+- Capture `self` directly in a `Task` created and awaited within the same scope; use `[weak self]` only when the task can outlive its owner (e.g. detached or long-lived tasks).
+- Hop to `@MainActor` explicitly (`Task { @MainActor in ... }` or `await MainActor.run { ... }`) when mutating UI state from a non-isolated context.

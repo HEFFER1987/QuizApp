@@ -1,0 +1,17 @@
+---
+description: SwiftUI view conventions for this project
+globs: **/*View.swift
+alwaysApply: false
+---
+
+# SwiftUI Views
+
+- Extract subviews as `private var subview: some View` or separate `private struct`s; keep `body` a thin composition of them.
+- Never put business logic or heavy computation inside `body` — delegate to the ViewModel or a helper.
+- Scope property wrappers to their real lifetime:
+  - `@State` — local, view-owned value state.
+  - `@StateObject` — reference type the view creates and owns.
+  - `@ObservedObject` — reference type injected from outside.
+  - `@EnvironmentObject` — app-wide shared state.
+- Add a `#Preview` for every new view.
+- Naming: `<Name>View`.

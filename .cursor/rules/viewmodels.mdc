@@ -1,0 +1,13 @@
+---
+description: ViewModel conventions for this project
+globs: **/*ViewModel*.swift
+alwaysApply: false
+---
+
+# ViewModels
+
+- Define a `<Name>ViewModel: ObservableObject` protocol plus a `final class <Name>ViewModelImpl` conforming to it (see `SignUpViewModel` / `SignUpViewModelImpl`).
+- Annotate the implementation `@MainActor`; expose state via `@Published`; mutate state only on the main thread.
+- Inject services and coordinators as protocols through the initializer — never instantiate concrete services inline — so they can be mocked in unit tests.
+- Model failures as a per-feature `enum: Error` (e.g. `SignUpError`) with one case per failure mode; don't leak raw `Error` to the view.
+- Use `guard` for early exits/validation instead of nested `if`.
