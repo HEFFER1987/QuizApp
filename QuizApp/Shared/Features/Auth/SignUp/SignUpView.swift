@@ -79,7 +79,7 @@ struct SignUpView<ViewModel: SignUpViewModel>: View {
                     request.requestedScopes = [.fullName, .email]
                     request.nonce = nonce.sha256()
                 } onCompletion: { result in
-                    viewModel.signUpWithApple(result: result)
+                    viewModel.signUpWithApple(result: result, rawNonce: currentNonce)
                 }
                 .signInWithAppleButtonStyle(.black)
                 .frame(height: 50)

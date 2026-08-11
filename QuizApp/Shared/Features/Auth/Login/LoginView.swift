@@ -75,7 +75,7 @@ struct LoginView<ViewModel: LoginViewModel>: View {
                     request.requestedScopes = [.fullName, .email]
                     request.nonce = nonce.sha256()
                 } onCompletion: { result in
-                    viewModel.loginWithApple(result: result)
+                    viewModel.loginWithApple(result: result, rawNonce: currentNonce)
                 }
                 // Styles: .black, .white, .whiteOutline
                 .signInWithAppleButtonStyle(.black)

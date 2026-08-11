@@ -19,7 +19,7 @@ protocol LoginViewModel: ObservableObject {
 
     func login()
     func signUp()
-    func loginWithApple(result: Result<ASAuthorization, any Error>)
+    func loginWithApple(result: Result<ASAuthorization, any Error>, rawNonce: String?)
     func loginWithGoogle()
 }
 
@@ -77,7 +77,7 @@ final class LoginViewModelImpl: AuthViewModelBase, LoginViewModel {
         }
     }
 
-    func loginWithApple(result: Result<ASAuthorization, any Error>) {
+    func loginWithApple(result: Result<ASAuthorization, any Error>, rawNonce: String?) {
         defer {
             self.isLoading = false
         }
@@ -92,16 +92,18 @@ final class LoginViewModelImpl: AuthViewModelBase, LoginViewModel {
                 self.error = .appleIDCredentialEmpty
                 return
             }
-            guard let rawNonce = appleIDCredential.authorizationCode else {
-                self.error = .appleIDCredentialEmpty
+            guard let rawNonce else {
+                self.error = .rawNonceEmpty
                 return
             }
-            let idTokenString = String(data: idToken, encoding: .utf8) ?? ""
-            let rawNonceString = String(data: rawNonce, encoding: .utf8) ?? ""
+            guard let idTokenString = String(data: idToken, encoding: .utf8) else {
+                self.error = .idTokenEmpty
+                return
+            }
 
             Task {
                 do {
-                    _ = try await authManager.signIn(method: .apple(idToken: idTokenString, rawNonce: rawNonceString))
+                    _ = try await authManager.signIn(method: .apple(idToken: idTokenString, rawNonce: rawNonce))
                 } catch {
                     Logger.shared.log("Firebase sign in with Apple failed: \(error)", level: .error)
                     await MainActor.run { self.error = .firebase(error: error) }
