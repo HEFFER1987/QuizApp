@@ -53,7 +53,7 @@ final class AuthManagerImp: AuthManager {
     func registerInFirebaseWithGoogle(idToken: String, accessToken: String) async throws -> String {
         try await signUpWithGoogleInFirebase(idToken: idToken, accessToken: accessToken)
     }
-    
+
     func signUpWithGoogleInFirebase(idToken: String, accessToken: String) async throws -> String {
         let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
         let result = try await auth.signIn(with: credential)

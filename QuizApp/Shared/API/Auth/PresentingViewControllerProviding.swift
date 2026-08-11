@@ -4,7 +4,7 @@ protocol PresentingViewControllerProviding {
     var topViewController: UIViewController? { get }
 }
 
-final class UIApplicationPresentingViewControllerProvider: PresentingViewControllerProviding {
+final class UIApplicationTopViewControllerProvider: PresentingViewControllerProviding {
     var topViewController: UIViewController? {
         let scenes = UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
@@ -21,4 +21,3 @@ final class UIApplicationPresentingViewControllerProvider: PresentingViewControl
         return top
     }
 }
-

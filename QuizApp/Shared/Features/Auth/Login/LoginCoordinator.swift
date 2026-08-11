@@ -3,6 +3,7 @@ import SUICoordinator
 
 protocol LoginCoordinator {
     func showSignUp() async
+    func showMainApp() async
 }
 
 class LoginCoordinatorImpl: Coordinator<LoginRoute>, LoginCoordinator {
@@ -13,7 +14,11 @@ class LoginCoordinatorImpl: Coordinator<LoginRoute>, LoginCoordinator {
 
     func showSignUp() async {
         let coordinator = SignUpCoordinatorImpl()
-//        await navigate(toRoute: .signup(coordinator: coordinator))
         await navigate(to: coordinator, presentationStyle: .push)
+    }
+
+    func showMainApp() async {
+        let coordinator = MainTabCoordinatorImpl()
+        await navigate(to: coordinator, presentationStyle: .fullScreenCover)
     }
 }

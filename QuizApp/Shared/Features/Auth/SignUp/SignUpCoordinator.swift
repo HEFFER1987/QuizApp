@@ -3,6 +3,7 @@ import SUICoordinator
 
 protocol SignUpCoordinator {
     func moveBackToLogin() async
+    func showMainApp() async
 }
 
 class SignUpCoordinatorImpl: Coordinator<DefaultRoute>, SignUpCoordinator {
@@ -16,12 +17,22 @@ class SignUpCoordinatorImpl: Coordinator<DefaultRoute>, SignUpCoordinator {
 
         await startFlow(route: route)
     }
-    
+
     func moveBackToLogin() async {
         await finishFlow(animated: true)
     }
 
-    func singup() async {
-        
+    func showMainApp() async {
+        // Present from Login so MainTab covers the whole auth stack,
+        // not from SignUp (a non-fullscreen push overlay).
+        if let loginCoordinator = parent as? LoginCoordinatorImpl {
+            await loginCoordinator.showMainApp()
+            return
+        }
+
+        await navigate(
+            to: MainTabCoordinatorImpl(),
+            presentationStyle: .fullScreenCover
+        )
     }
 }

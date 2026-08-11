@@ -1,8 +1,5 @@
 "login.welcome.title" = "Welcome Back!";
-//"login.email.placeholder" = "Email";
-//"login.password.placeholder" = "Password";
 "login.action.login" = "Login";
-//"login.action.signup" = "Sign Up";
 "login.google.button" = "Sign in with Google";
 "login.password.hide" = "Hide password";
 "login.password.show" = "Show password";
@@ -17,3 +14,25 @@
 "common.email.placeholder" = "Email";
 "common.password.placeholder" = "Password";
 "common.action.signup" = "Sign Up";
+
+"quizList.title" = "My QUIZes";
+"quizList.search.placeholder" = "Search quizzes";
+"quizList.filter.all" = "All";
+"quizList.filter.drafts" = "Drafts";
+"quizList.filter.published" = "Published";
+"quizList.status.draft" = "Draft";
+"quizList.status.published" = "Published";
+"quizList.stats.questions" = "%d questions";
+"quizList.stats.attempts" = "%d attempts";
+"quizList.stats.updated" = "Updated %@";
+
+"mainTab.quizzes" = "My QUIZes";
+"mainTab.explore" = "Explore";
+"mainTab.results" = "Results";
+"mainTab.profile" = "Profile";
+
+"placeholder.explore.title" = "Explore";
+"placeholder.results.title" = "Results";
+"placeholder.profile.title" = "Profile";
+
+"quizBuilder.title" = "Create Quiz";

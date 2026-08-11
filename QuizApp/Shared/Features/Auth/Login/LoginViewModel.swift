@@ -34,7 +34,7 @@ final class LoginViewModelImpl: AuthViewModelBase, LoginViewModel {
         authManager: AuthManager = AuthManagerImp(),
         googleSignInProvider: GoogleSignInProviding = GoogleSignInProvider(),
         presentingViewControllerProvider: PresentingViewControllerProviding =
-            UIApplicationPresentingViewControllerProvider()
+            UIApplicationTopViewControllerProvider()
     ) {
         self.coordinator = coordinator
         super.init(
@@ -63,7 +63,8 @@ final class LoginViewModelImpl: AuthViewModelBase, LoginViewModel {
 
         Task {
             do {
-                _ = try await authManager.signIn(method: .email(email: email, password: password))
+                let userId = try await authManager.signIn(method: .email(email: email, password: password))
+                await handleAuthSuccess(userId: userId, provider: .email)
             } catch {
                 Logger.shared.log("Firebase sign in failed: \(error)", level: .error)
                 self.error = .firebase(error: error)
@@ -103,7 +104,10 @@ final class LoginViewModelImpl: AuthViewModelBase, LoginViewModel {
 
             Task {
                 do {
-                    _ = try await authManager.signIn(method: .apple(idToken: idTokenString, rawNonce: rawNonce))
+                    let userId = try await authManager.signIn(
+                        method: .apple(idToken: idTokenString, rawNonce: rawNonce)
+                    )
+                    await handleAuthSuccess(userId: userId, provider: .apple)
                 } catch {
                     Logger.shared.log("Firebase sign in with Apple failed: \(error)", level: .error)
                     await MainActor.run { self.error = .firebase(error: error) }
@@ -129,9 +133,10 @@ final class LoginViewModelImpl: AuthViewModelBase, LoginViewModel {
 
             do {
                 let tokens = try await googleSignInTokens()
-                _ = try await authManager.signIn(
+                let userId = try await authManager.signIn(
                     method: .google(idToken: tokens.idToken, accessToken: tokens.accessToken)
                 )
+                await handleAuthSuccess(userId: userId, provider: .google)
             } catch let googleError as GoogleSignInError {
                 Logger.shared.log("Google sign-in failed: \(googleError)", level: .error)
                 await MainActor.run { self.error = googleError.toLoginError }
@@ -143,6 +148,12 @@ final class LoginViewModelImpl: AuthViewModelBase, LoginViewModel {
                 await MainActor.run { self.error = .firebase(error: error) }
             }
         }
+    }
+
+    @MainActor
+    private func handleAuthSuccess(userId: String, provider: AuthorizationProvider) async {
+        AppStateManager.shared.setAuthorized(userId: userId, provider: provider)
+        await coordinator.showMainApp()
     }
 }
 

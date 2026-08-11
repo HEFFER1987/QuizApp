@@ -176,25 +176,7 @@ final class Logger {
         let baseName = "log_\(dateString)"
         let fileExtension = "txt"
 
-        var todaysFiles: [URL] = []
-
-        if fileManager.fileExists(atPath: logsDirectory.path) {
-            do {
-                let allFiles = try fileManager.contentsOfDirectory(
-                    at: logsDirectory,
-                    includingPropertiesForKeys: [.fileSizeKey],
-                    options: [.skipsHiddenFiles]
-                )
-
-                todaysFiles = allFiles.filter { url in
-                    url.deletingPathExtension().lastPathComponent.hasPrefix(baseName) &&
-                    url.pathExtension == fileExtension
-                }
-            } catch {
-                // If the directory can't be read, just start a new file
-                todaysFiles = []
-            }
-        }
+        let todaysFiles = todaysLogFiles(in: logsDirectory, baseName: baseName, fileExtension: fileExtension)
 
         // If there are no files for today yet, create the first one
         if todaysFiles.isEmpty {
@@ -233,6 +215,26 @@ final class Logger {
             let nextIndex = max(maxIndex, 1) + 1
             let fileName = String(format: "%@_%02d.%@", baseName, nextIndex, fileExtension)
             return logsDirectory.appendingPathComponent(fileName)
+        }
+    }
+
+    private func todaysLogFiles(in logsDirectory: URL, baseName: String, fileExtension: String) -> [URL] {
+        guard fileManager.fileExists(atPath: logsDirectory.path) else { return [] }
+
+        do {
+            let allFiles = try fileManager.contentsOfDirectory(
+                at: logsDirectory,
+                includingPropertiesForKeys: [.fileSizeKey],
+                options: [.skipsHiddenFiles]
+            )
+
+            return allFiles.filter { url in
+                url.deletingPathExtension().lastPathComponent.hasPrefix(baseName) &&
+                url.pathExtension == fileExtension
+            }
+        } catch {
+            // If the directory can't be read, just start a new file
+            return []
         }
     }
 

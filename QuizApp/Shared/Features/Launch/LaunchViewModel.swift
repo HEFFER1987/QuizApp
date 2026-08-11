@@ -17,7 +17,11 @@ class LaunchViewModelImpl: LaunchViewModel {
         Task {
             do {
                 try await Task.sleep(for: .seconds(3))
-                await coordinator.showLogin()
+                if AppStateManager.shared.authorizationState.isAuthorized {
+                    await coordinator.showMainApp()
+                } else {
+                    await coordinator.showLogin()
+                }
             } catch {
                 print("Error starting timer: \(error)")
             }

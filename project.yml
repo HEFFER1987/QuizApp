@@ -65,7 +65,7 @@ targets:
           - name: "Run Firebase plist file script"
             script: |
               echo "Running a Firebase plist script"
-              PLIST_DEST="${TARGET_BUILD_DIR}/${UNWRAPPED_PRODUCT_NAME}.app/GoogleService-Info.plist"
+              PLIST_DEST="${TARGET_BUILD_DIR}/${WRAPPER_NAME}/GoogleService-Info.plist"
               if [ "${CONFIGURATION}" == "Release" ]; then
                 SOURCE="${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Prod.plist"
               else
@@ -182,7 +182,7 @@ targets:
           - name: "Run Firebase plist file script"
             script: |
               echo "Running a Firebase plist script"
-              PLIST_DEST="${TARGET_BUILD_DIR}/${UNWRAPPED_PRODUCT_NAME}.app/GoogleService-Info.plist"
+              PLIST_DEST="${TARGET_BUILD_DIR}/${WRAPPER_NAME}/GoogleService-Info.plist"
               if [ "${CONFIGURATION}" == "Release" ]; then
                 SOURCE="${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Prod.plist"
               else
@@ -253,4 +253,19 @@ targets:
         settings:
             base:
                 GENERATE_INFOPLIST_FILE: YES
-        
+
+schemes:
+    QuizApp-iOS:
+        build:
+            targets:
+                QuizApp-iOS: all
+                QuizAppTests: all
+                QuizAppUITests: all
+        run:
+            config: Debug
+        test:
+            config: Debug
+            targets:
+                - QuizAppTests
+                - QuizAppUITests
+

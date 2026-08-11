@@ -13,7 +13,7 @@ class AuthViewModelBase: ObservableObject {
         authManager: AuthManager = AuthManagerImp(),
         googleSignInProvider: GoogleSignInProviding = GoogleSignInProvider(),
         presentingViewControllerProvider: PresentingViewControllerProviding =
-            UIApplicationPresentingViewControllerProvider()
+            UIApplicationTopViewControllerProvider()
     ) {
         self.authManager = authManager
         self.googleSignInProvider = googleSignInProvider
