@@ -10,7 +10,7 @@ struct LaunchView<ViewModel: LaunchViewModel>: View {
 
     var body: some View {
         ZStack {
-            
+
             CommonBackgroundView()
 
             ProgressView()

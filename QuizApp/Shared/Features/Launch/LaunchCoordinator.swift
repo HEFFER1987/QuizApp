@@ -8,7 +8,7 @@ protocol LaunchCoordinator {
 }
 
 class LaunchCoordinatorImpl: Coordinator<LaunchRoute>, LaunchCoordinator {
-    
+
     override func start() async {
         await startFlow(route: .main(coordinator: self))
     }
@@ -20,6 +20,7 @@ class LaunchCoordinatorImpl: Coordinator<LaunchRoute>, LaunchCoordinator {
 
     func showLogin() async {
         let coordinator = LoginCoordinatorImpl()
-        await navigate(toRoute: .login(coordinator: coordinator))
+//        await navigate(toRoute: .login(coordinator: coordinator))
+        await navigate(to: coordinator, presentationStyle: .custom(transition: .identity, animation: .default, fullScreen: true))
     }
 }

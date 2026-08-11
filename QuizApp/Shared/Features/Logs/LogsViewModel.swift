@@ -1,7 +1,7 @@
 import Foundation
 
 protocol LogsViewModel: ObservableObject {
-    
+
 }
 
 class LogsViewModelImpl: LogsViewModel {
@@ -11,5 +11,4 @@ class LogsViewModelImpl: LogsViewModel {
     init (coordinator: LogsCoordinator) {
         self.coordinator = coordinator
     }
-
 }
