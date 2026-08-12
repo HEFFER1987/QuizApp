@@ -6,7 +6,15 @@ protocol ResultsCoordinator {
 
 final class ResultsCoordinatorImpl: ResultsCoordinator {
 
+    private weak var mainTabCoordinator: MainTabCoordinatorImpl?
+
+    init(mainTabCoordinator: MainTabCoordinatorImpl? = nil) {
+        self.mainTabCoordinator = mainTabCoordinator
+    }
+
     func openResult(_ result: QuizResult) {
-        Logger.shared.log("Result tapped: \(result.quizTitle)", level: .info)
+        Task {
+            await mainTabCoordinator?.showResultDetail(result)
+        }
     }
 }

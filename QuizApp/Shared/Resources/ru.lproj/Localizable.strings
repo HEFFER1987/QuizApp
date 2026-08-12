@@ -25,3 +25,20 @@
 "resultsHistory.date.yesterday" = "Вчера, %@";
 "resultsHistory.date.at" = "%@, %@";
 
+"resultsDetail.title" = "Разбор результата";
+"resultsDetail.back" = "Назад";
+"resultsDetail.yourAnswer" = "Ваш ответ";
+"resultsDetail.correctAnswer" = "Правильный ответ";
+"resultsDetail.explanation" = "Пояснение";
+"resultsDetail.filter.all" = "Все вопросы";
+"resultsDetail.filter.errorsOnly" = "Только ошибки (%d)";
+"resultsDetail.retake" = "Перепройти квиз";
+"resultsDetail.shareResult" = "Поделиться результатом";
+"resultsDetail.share" = "Поделиться";
+"resultsDetail.time" = "Время";
+"resultsDetail.difficulty.easy" = "Лёгкая сложность";
+"resultsDetail.difficulty.medium" = "Средняя сложность";
+"resultsDetail.difficulty.hard" = "Сложная сложность";
+"resultsDetail.meta" = "%@ • %@";
+"resultsDetail.shareText" = "%@ — %d%% (%d/%d), +%d XP";
+

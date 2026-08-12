@@ -96,11 +96,11 @@ final class ResultsPreviewViewModel: ResultsViewModel {
                 iconName: "chevron.left.forwardslash.chevron.right",
                 iconGlow: .blue,
                 completedAt: calendar.date(byAdding: .day, value: -1, to: now) ?? now,
-                correctCount: 12,
-                totalCount: 15,
+                correctCount: 10,
+                totalCount: 12,
                 durationSeconds: 225,
                 xpEarned: 150,
-                scorePercent: 80,
+                scorePercent: 82,
                 isComposite: false
             ),
             QuizResult(

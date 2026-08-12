@@ -132,3 +132,20 @@
 "resultsHistory.score.percent" = "%d%%";
 "resultsHistory.date.yesterday" = "Yesterday, %@";
 "resultsHistory.date.at" = "%@, %@";
+
+"resultsDetail.title" = "Result Breakdown";
+"resultsDetail.back" = "Back";
+"resultsDetail.yourAnswer" = "Your answer";
+"resultsDetail.correctAnswer" = "Correct answer";
+"resultsDetail.explanation" = "Explanation";
+"resultsDetail.filter.all" = "All questions";
+"resultsDetail.filter.errorsOnly" = "Only errors (%d)";
+"resultsDetail.retake" = "Retake quiz";
+"resultsDetail.shareResult" = "Share result";
+"resultsDetail.share" = "Share";
+"resultsDetail.time" = "Time";
+"resultsDetail.difficulty.easy" = "Easy difficulty";
+"resultsDetail.difficulty.medium" = "Medium difficulty";
+"resultsDetail.difficulty.hard" = "Hard difficulty";
+"resultsDetail.meta" = "%@ • %@";
+"resultsDetail.shareText" = "%@ — %d%% (%d/%d), +%d XP";
