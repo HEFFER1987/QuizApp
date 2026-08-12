@@ -13,7 +13,10 @@ enum MainTabRoute: RouteType {
     var body: some View {
         switch self {
         case .main(let coordinator):
-            MainTabView(quizListViewModel: coordinator.makeQuizListViewModel())
+            MainTabView(
+                quizListViewModel: coordinator.makeQuizListViewModel(),
+                resultsViewModel: coordinator.makeResultsViewModel()
+            )
         }
     }
 }

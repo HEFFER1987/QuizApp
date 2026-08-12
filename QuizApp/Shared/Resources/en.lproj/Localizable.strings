@@ -116,3 +116,19 @@
 "quizBuilder.preview.estimatedMinutes" = "~ %d min";
 "quizBuilder.preview.continue" = "Continue";
 "quizBuilder.preview.share" = "Share";
+
+"resultsHistory.title" = "Results History";
+"resultsHistory.filter.all" = "All";
+"resultsHistory.filter.excellent" = "Excellent (90%+)";
+"resultsHistory.filter.needsReview" = "Needs review (<70%)";
+"resultsHistory.filter.composite" = "Composite tests";
+"resultsHistory.summary.average" = "avg score";
+"resultsHistory.summary.quizzesCompleted" = "Quizzes completed";
+"resultsHistory.summary.totalAttempts" = "Total attempts";
+"resultsHistory.summary.streak" = "day streak";
+"resultsHistory.stats.score" = "%d/%d";
+"resultsHistory.stats.duration" = "%@ min";
+"resultsHistory.stats.xp" = "+%d XP";
+"resultsHistory.score.percent" = "%d%%";
+"resultsHistory.date.yesterday" = "Yesterday, %@";
+"resultsHistory.date.at" = "%@, %@";

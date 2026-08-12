@@ -9,3 +9,19 @@
 
 "logs.title" = "Логи";
 
+"resultsHistory.title" = "История результатов";
+"resultsHistory.filter.all" = "Все";
+"resultsHistory.filter.excellent" = "Отличные (90%+)";
+"resultsHistory.filter.needsReview" = "Требуют повторения (<70%)";
+"resultsHistory.filter.composite" = "Сборные тесты";
+"resultsHistory.summary.average" = "средний результат";
+"resultsHistory.summary.quizzesCompleted" = "Пройдено квизов";
+"resultsHistory.summary.totalAttempts" = "Всего попыток";
+"resultsHistory.summary.streak" = "дней подряд";
+"resultsHistory.stats.score" = "%d/%d";
+"resultsHistory.stats.duration" = "%@ мин";
+"resultsHistory.stats.xp" = "+%d XP";
+"resultsHistory.score.percent" = "%d%%";
+"resultsHistory.date.yesterday" = "Вчера, %@";
+"resultsHistory.date.at" = "%@, %@";
+

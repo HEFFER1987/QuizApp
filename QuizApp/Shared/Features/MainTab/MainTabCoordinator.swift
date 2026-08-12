@@ -11,6 +11,10 @@ class MainTabCoordinatorImpl: Coordinator<MainTabRoute>, MainTabCoordinator {
         QuizListCoordinatorImpl(mainTabCoordinator: self)
     }()
 
+    private lazy var resultsCoordinator: ResultsCoordinatorImpl = {
+        ResultsCoordinatorImpl()
+    }()
+
     override func start() async {
         await startFlow(route: .main(coordinator: self))
     }
@@ -22,5 +26,9 @@ class MainTabCoordinatorImpl: Coordinator<MainTabRoute>, MainTabCoordinator {
 
     func makeQuizListViewModel() -> QuizListViewModelImpl {
         QuizListViewModelImpl(coordinator: quizListCoordinator)
+    }
+
+    func makeResultsViewModel() -> ResultsViewModelImpl {
+        ResultsViewModelImpl(coordinator: resultsCoordinator)
     }
 }
