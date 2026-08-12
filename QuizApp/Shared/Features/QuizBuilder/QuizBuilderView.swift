@@ -12,39 +12,47 @@ struct QuizBuilderView<ViewModel: QuizBuilderViewModel>: View {
         ZStack {
             QuizListBackgroundView()
 
-            VStack(spacing: 0) {
-                navigationBar
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
-
-                QuizBuilderStepHeader(currentStep: viewModel.currentStep)
-                    .padding(.horizontal, 8)
-                    .padding(.top, 16)
-
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        if let introText {
-                            Text(introText)
-                                .font(.system(size: 14, weight: .regular, design: .rounded))
-                                .foregroundStyle(QuizTheme.mutedText)
-                                .padding(.horizontal, 4)
-                        }
-
-                        stepContent
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 16)
-                    .padding(.bottom, 24)
-                }
-
-                footer
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 12)
+            if viewModel.currentStep == .preview {
+                QuizBuilderPreviewView(viewModel: viewModel)
+            } else {
+                wizardContent
             }
         }
         .toolbar(.hidden, for: .navigationBar)
         .sheet(item: questionEditorBinding) { _ in
             QuizBuilderQuestionEditorView(viewModel: viewModel)
+        }
+    }
+
+    private var wizardContent: some View {
+        VStack(spacing: 0) {
+            navigationBar
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+
+            QuizBuilderStepHeader(currentStep: viewModel.currentStep)
+                .padding(.horizontal, 8)
+                .padding(.top, 16)
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    if let introText {
+                        Text(introText)
+                            .font(.system(size: 14, weight: .regular, design: .rounded))
+                            .foregroundStyle(QuizTheme.mutedText)
+                            .padding(.horizontal, 4)
+                    }
+
+                    stepContent
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 24)
+            }
+
+            footer
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
         }
     }
 
@@ -105,7 +113,7 @@ struct QuizBuilderView<ViewModel: QuizBuilderViewModel>: View {
         case .questions:
             QuizBuilderQuestionsForm(viewModel: viewModel)
         case .preview:
-            placeholderCard(text: Strings.QuizBuilder.Placeholder.preview)
+            EmptyView()
         case .publish:
             placeholderCard(text: Strings.QuizBuilder.Placeholder.publish)
         }

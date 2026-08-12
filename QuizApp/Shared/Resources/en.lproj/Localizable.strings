@@ -107,3 +107,12 @@
 "quizBuilder.editor.autosaveHint" = "All changes are saved automatically";
 "quizBuilder.placeholder.preview" = "Preview coming soon";
 "quizBuilder.placeholder.publish" = "Publish coming soon";
+"quizBuilder.preview.title" = "Quiz Preview";
+"quizBuilder.preview.backToEdit" = "Back to edit";
+"quizBuilder.preview.tip" = "This is how participants will see your quiz.";
+"quizBuilder.preview.bookmark" = "Bookmark question";
+"quizBuilder.preview.questionProgress" = "Question %d of %d";
+"quizBuilder.preview.questionsCount" = "%d questions";
+"quizBuilder.preview.estimatedMinutes" = "~ %d min";
+"quizBuilder.preview.continue" = "Continue";
+"quizBuilder.preview.share" = "Share";

@@ -93,6 +93,20 @@ protocol QuizBuilderViewModel: ObservableObject {
     func saveQuestionEditor()
     func cancelQuestionEditor()
     func deleteQuestionFromEditor()
+
+    var previewQuestionIndex: Int { get }
+    var currentPreviewQuestion: QuizBuilderQuestion? { get }
+    var isOnLastPreviewQuestion: Bool { get }
+    var previewEstimatedMinutes: Int { get }
+    var sharePreviewText: String { get }
+    var isCurrentPreviewQuestionBookmarked: Bool { get }
+
+    func selectPreviewOption(_ optionID: UUID)
+    func isPreviewOptionSelected(_ optionID: UUID) -> Bool
+    func togglePreviewBookmark()
+    func goToPreviewQuestion(at index: Int)
+    func previewGoNext()
+    func previewGoBack()
 }
 
 enum QuizBuilderLimits {
@@ -126,6 +140,9 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
     @Published var language: QuizLanguageOption = .english
     @Published private(set) var questions: [QuizBuilderQuestion] = []
     @Published var questionEditor: QuizBuilderQuestionEditorState?
+    @Published private(set) var previewQuestionIndex: Int = 0
+    @Published private var previewSelectedOptionIDs: [UUID: Set<UUID>] = [:]
+    @Published private var previewBookmarkedQuestionIDs: Set<UUID> = []
 
     var titleCharacterCount: Int { title.count }
     var descriptionCharacterCount: Int { descriptionText.count }
@@ -140,6 +157,34 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
 
     var editorQuestionTotal: Int {
         max(questions.count, 1)
+    }
+
+    var currentPreviewQuestion: QuizBuilderQuestion? {
+        guard questions.indices.contains(previewQuestionIndex) else { return nil }
+        return questions[previewQuestionIndex]
+    }
+
+    var isOnLastPreviewQuestion: Bool {
+        guard !questions.isEmpty else { return true }
+        return previewQuestionIndex >= questions.count - 1
+    }
+
+    var previewEstimatedMinutes: Int {
+        max(1, (questions.count + 1) / 2)
+    }
+
+    var sharePreviewText: String {
+        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedDescription = descriptionText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedDescription.isEmpty {
+            return trimmedTitle
+        }
+        return "\(trimmedTitle)\n\(trimmedDescription)"
+    }
+
+    var isCurrentPreviewQuestionBookmarked: Bool {
+        guard let questionID = currentPreviewQuestion?.id else { return false }
+        return previewBookmarkedQuestionIDs.contains(questionID)
     }
 
     var canGoNext: Bool {
@@ -160,6 +205,9 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
     func goNext() {
         guard canGoNext else { return }
         guard currentStep != .publish, let next = currentStep.next else { return }
+        if next == .preview {
+            resetPreviewSession()
+        }
         currentStep = next
     }
 
@@ -235,6 +283,63 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
         guard let draftID = questionEditor?.draft.id else { return }
         questions.removeAll { $0.id == draftID }
         questionEditor = nil
+    }
+
+    func selectPreviewOption(_ optionID: UUID) {
+        guard let question = currentPreviewQuestion else { return }
+        var selections = previewSelectedOptionIDs
+        var selected = selections[question.id] ?? []
+        switch question.type {
+        case .singleChoice:
+            selected = [optionID]
+        case .multipleChoice:
+            if selected.contains(optionID) {
+                selected.remove(optionID)
+            } else {
+                selected.insert(optionID)
+            }
+        }
+        selections[question.id] = selected
+        previewSelectedOptionIDs = selections
+    }
+
+    func isPreviewOptionSelected(_ optionID: UUID) -> Bool {
+        guard let questionID = currentPreviewQuestion?.id else { return false }
+        return previewSelectedOptionIDs[questionID]?.contains(optionID) ?? false
+    }
+
+    func togglePreviewBookmark() {
+        guard let questionID = currentPreviewQuestion?.id else { return }
+        var bookmarks = previewBookmarkedQuestionIDs
+        if bookmarks.contains(questionID) {
+            bookmarks.remove(questionID)
+        } else {
+            bookmarks.insert(questionID)
+        }
+        previewBookmarkedQuestionIDs = bookmarks
+    }
+
+    func goToPreviewQuestion(at index: Int) {
+        guard questions.indices.contains(index) else { return }
+        previewQuestionIndex = index
+    }
+
+    func previewGoNext() {
+        if isOnLastPreviewQuestion {
+            goNext()
+            return
+        }
+        goToPreviewQuestion(at: previewQuestionIndex + 1)
+    }
+
+    func previewGoBack() {
+        goToPreviewQuestion(at: previewQuestionIndex - 1)
+    }
+
+    private func resetPreviewSession() {
+        previewQuestionIndex = 0
+        previewSelectedOptionIDs = [:]
+        previewBookmarkedQuestionIDs = []
     }
 
     private func upsertQuestion(_ question: QuizBuilderQuestion) {
