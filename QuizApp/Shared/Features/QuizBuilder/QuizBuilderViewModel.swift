@@ -80,6 +80,9 @@ protocol QuizBuilderViewModel: ObservableObject {
     func selectCover(_ cover: QuizCoverOption)
     func tapMoreCovers()
 
+    var editorQuestionIndex: Int { get }
+    var editorQuestionTotal: Int { get }
+
     func addQuestion()
     func editQuestion(_ question: QuizBuilderQuestion)
     func duplicateQuestion(_ question: QuizBuilderQuestion)
@@ -89,6 +92,7 @@ protocol QuizBuilderViewModel: ObservableObject {
     func updateEditorDraft(_ draft: QuizBuilderQuestion)
     func saveQuestionEditor()
     func cancelQuestionEditor()
+    func deleteQuestionFromEditor()
 }
 
 enum QuizBuilderLimits {
@@ -125,6 +129,18 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
 
     var titleCharacterCount: Int { title.count }
     var descriptionCharacterCount: Int { descriptionText.count }
+
+    var editorQuestionIndex: Int {
+        guard let draftID = questionEditor?.draft.id,
+              let index = questions.firstIndex(where: { $0.id == draftID }) else {
+            return max(questions.count, 1)
+        }
+        return index + 1
+    }
+
+    var editorQuestionTotal: Int {
+        max(questions.count, 1)
+    }
 
     var canGoNext: Bool {
         switch currentStep {
@@ -166,8 +182,10 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
     }
 
     func addQuestion() {
+        let draft = QuizBuilderQuestion()
+        questions.append(draft)
         questionEditor = QuizBuilderQuestionEditorState(
-            draft: QuizBuilderQuestion(),
+            draft: draft,
             isNew: true
         )
     }
@@ -197,20 +215,15 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
 
     func updateEditorDraft(_ draft: QuizBuilderQuestion) {
         guard var editor = questionEditor else { return }
-        editor.draft = sanitize(draft)
+        let sanitized = sanitize(draft)
+        editor.draft = sanitized
         questionEditor = editor
+        upsertQuestion(sanitized)
     }
 
     func saveQuestionEditor() {
         guard let editor = questionEditor, editor.draft.isValid else { return }
-        let draft = sanitize(editor.draft)
-
-        if editor.isNew {
-            questions.append(draft)
-        } else if let index = questions.firstIndex(where: { $0.id == draft.id }) {
-            questions[index] = draft
-        }
-
+        upsertQuestion(sanitize(editor.draft))
         questionEditor = nil
     }
 
@@ -218,10 +231,28 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
         questionEditor = nil
     }
 
+    func deleteQuestionFromEditor() {
+        guard let draftID = questionEditor?.draft.id else { return }
+        questions.removeAll { $0.id == draftID }
+        questionEditor = nil
+    }
+
+    private func upsertQuestion(_ question: QuizBuilderQuestion) {
+        if let index = questions.firstIndex(where: { $0.id == question.id }) {
+            questions[index] = question
+        } else {
+            questions.append(question)
+        }
+    }
+
     private func sanitize(_ question: QuizBuilderQuestion) -> QuizBuilderQuestion {
         var result = question
         clamp(&result.prompt, maxLength: QuizBuilderQuestionLimits.promptMaxLength)
-        clamp(&result.acceptedTextAnswer, maxLength: QuizBuilderQuestionLimits.textAnswerMaxLength)
+        clamp(&result.explanation, maxLength: QuizBuilderQuestionLimits.explanationMaxLength)
+        result.points = min(
+            max(result.points, QuizBuilderQuestionLimits.minimumPoints),
+            QuizBuilderQuestionLimits.maximumPoints
+        )
         result.options = result.options.map { option in
             var updated = option
             clamp(&updated.text, maxLength: QuizBuilderQuestionLimits.optionMaxLength)

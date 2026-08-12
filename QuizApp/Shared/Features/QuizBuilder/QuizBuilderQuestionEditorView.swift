@@ -2,13 +2,10 @@ import SwiftUI
 
 struct QuizBuilderQuestionEditorView<ViewModel: QuizBuilderViewModel>: View {
     @ObservedObject var viewModel: ViewModel
+    @State private var showTips = false
 
     private var draft: QuizBuilderQuestion {
         viewModel.questionEditor?.draft ?? QuizBuilderQuestion()
-    }
-
-    private var isNew: Bool {
-        viewModel.questionEditor?.isNew ?? true
     }
 
     var body: some View {
@@ -16,206 +13,98 @@ struct QuizBuilderQuestionEditorView<ViewModel: QuizBuilderViewModel>: View {
             ZStack {
                 QuizListBackgroundView()
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        promptSection
-                        typeSection
-                        if draft.type == .textAnswer {
-                            textAnswerSection
-                        } else {
-                            optionsSection
-                        }
+                    VStack(alignment: .leading, spacing: 18) {
+                        QuizBuilderQuestionEditorHeaderRow(
+                            index: viewModel.editorQuestionIndex,
+                            total: viewModel.editorQuestionTotal,
+                            type: draft.type,
+                            onSelectType: selectType
+                        )
+                        QuizBuilderQuestionEditorPromptSection(prompt: draftField(\.prompt))
+                        optionsSection
+                        QuizBuilderEditorExplanationSection(
+                            explanation: draftField(\.explanation)
+                        )
+                        QuizBuilderQuestionEditorSettingsSection(
+                            points: draftField(\.points),
+                            shuffleAnswers: draftField(\.shuffleAnswers)
+                        )
+                        QuizBuilderEditorFooterButtons(
+                            canSave: draft.isValid,
+                            onDelete: { viewModel.deleteQuestionFromEditor() },
+                            onSaveAndClose: { viewModel.saveQuestionEditor() }
+                        )
+                        .padding(.top, 4)
                     }
                     .padding(16)
                     .padding(.bottom, 24)
                 }
             }
-            .navigationTitle(
-                isNew
-                    ? Strings.QuizBuilder.Editor.addTitle
-                    : Strings.QuizBuilder.Editor.editTitle
-            )
+            .navigationTitle(Strings.QuizBuilder.Editor.title)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(Strings.QuizBuilder.Action.cancel) {
-                        viewModel.cancelQuestionEditor()
-                    }
-                    .foregroundStyle(QuizTheme.draftGlow)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(Strings.QuizBuilder.Action.save) {
-                        viewModel.saveQuestionEditor()
-                    }
-                    .fontWeight(.semibold)
-                    .foregroundStyle(draft.isValid ? QuizTheme.draftGlow : QuizTheme.mutedText)
-                    .disabled(!draft.isValid)
-                }
-            }
+            .toolbar { editorToolbar }
             .toolbarBackground(.hidden, for: .navigationBar)
+            .alert(
+                Strings.QuizBuilder.Editor.tipsTitle,
+                isPresented: $showTips
+            ) {
+                Button(Strings.QuizBuilder.Action.cancel, role: .cancel) {}
+            } message: {
+                Text(Strings.QuizBuilder.Editor.tipsMessage)
+            }
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }
 
-    private var promptSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            QuizBuilderEditorSectionLabel(
-                icon: "text.bubble.fill",
-                text: Strings.QuizBuilder.Editor.prompt
-            )
-            QuizBuilderOutlinedField(minHeight: 96) {
-                ZStack(alignment: .topLeading) {
-                    TextEditor(text: promptBinding)
-                        .font(.system(size: 16, weight: .regular, design: .rounded))
-                        .foregroundStyle(.white)
-                        .scrollContentBackground(.hidden)
-                        .tint(QuizTheme.draftGlow)
-                        .frame(minHeight: 76)
-                    if draft.prompt.isEmpty {
-                        Text(Strings.QuizBuilder.Editor.promptPlaceholder)
-                            .font(.system(size: 16, weight: .regular, design: .rounded))
-                            .foregroundStyle(QuizTheme.mutedText.opacity(0.7))
-                            .padding(.top, 8)
-                            .padding(.leading, 4)
-                            .allowsHitTesting(false)
-                    }
-                }
-            }
-            QuizBuilderEditorCharacterCount(
-                current: draft.prompt.count,
-                max: QuizBuilderQuestionLimits.promptMaxLength
-            )
-        }
-        .padding(16)
-        .background(QuizBuilderEditorCardBackground())
-    }
-
-    private var typeSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            QuizBuilderEditorSectionLabel(
-                icon: "slider.horizontal.3",
-                text: Strings.QuizBuilder.Editor.type
-            )
-            HStack(spacing: 8) {
-                ForEach(QuizBuilderQuestionType.allCases) { type in
-                    QuizBuilderQuestionTypeChip(
-                        type: type,
-                        isSelected: draft.type == type,
-                        onTap: { selectType(type) }
-                    )
-                }
+    @ToolbarContentBuilder
+    private var editorToolbar: some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            Button {
+                viewModel.cancelQuestionEditor()
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(QuizTheme.draftGlow)
             }
         }
-        .padding(16)
-        .background(QuizBuilderEditorCardBackground())
+        ToolbarItem(placement: .confirmationAction) {
+            Button(Strings.QuizBuilder.Action.save) {
+                viewModel.saveQuestionEditor()
+            }
+            .fontWeight(.semibold)
+            .foregroundStyle(draft.isValid ? QuizTheme.draftGlow : QuizTheme.mutedText)
+            .disabled(!draft.isValid)
+        }
     }
 
     private var optionsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            QuizBuilderEditorSectionLabel(
-                icon: "list.bullet",
-                text: Strings.QuizBuilder.Editor.options
-            )
-
-            ForEach(Array(draft.options.enumerated()), id: \.element.id) { index, option in
-                QuizBuilderOptionEditorRow(
-                    correctSymbol: correctSymbol(isCorrect: option.isCorrect),
-                    accent: option.isCorrect
-                        ? (draft.type == .multipleChoice ? QuizTheme.publishedGlow : QuizTheme.draftGlow)
-                        : QuizTheme.mutedText,
-                    canDelete: draft.options.count > QuizBuilderQuestionLimits.minimumOptions,
-                    text: optionTextBinding(at: index),
-                    onToggleCorrect: { toggleCorrect(at: index) },
-                    onDelete: { deleteOption(option.id) }
-                )
-            }
-
-            if draft.options.count < QuizBuilderQuestionLimits.maximumOptions {
-                addOptionButton
-            }
-        }
-        .padding(16)
-        .background(QuizBuilderEditorCardBackground())
-    }
-
-    private var addOptionButton: some View {
-        Button {
-            updateDraft { $0.options.append(QuizBuilderAnswerOption()) }
-        } label: {
-            HStack(spacing: 8) {
-                Image(systemName: "plus")
-                    .font(.system(size: 14, weight: .semibold))
-                Text(Strings.QuizBuilder.Action.addOption)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-            }
-            .foregroundStyle(QuizTheme.draftGlow)
-            .frame(maxWidth: .infinity)
-            .frame(height: 44)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(QuizTheme.draftGlow.opacity(0.8), lineWidth: 1.2)
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
-    private var textAnswerSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            QuizBuilderEditorSectionLabel(
-                icon: "textformat",
-                text: Strings.QuizBuilder.Editor.acceptedAnswer
-            )
-            QuizBuilderOutlinedField {
-                TextField(
-                    Strings.QuizBuilder.Editor.acceptedAnswerPlaceholder,
-                    text: acceptedAnswerBinding
-                )
-                .font(.system(size: 16, weight: .regular, design: .rounded))
-                .foregroundStyle(.white)
-                .tint(QuizTheme.draftGlow)
-            }
-            QuizBuilderEditorCharacterCount(
-                current: draft.acceptedTextAnswer.count,
-                max: QuizBuilderQuestionLimits.textAnswerMaxLength
-            )
-        }
-        .padding(16)
-        .background(QuizBuilderEditorCardBackground())
+        QuizBuilderQuestionEditorOptionsSection(
+            type: draft.type,
+            options: draft.options,
+            optionText: optionTextBinding,
+            onTips: { showTips = true },
+            onToggleCorrect: toggleCorrect,
+            onDuplicate: duplicateOption,
+            onDelete: deleteOption,
+            onAdd: {
+                let option = QuizBuilderAnswerOption()
+                updateDraft { $0.options.append(option) }
+                return option.id
+            },
+            onMove: moveOption
+        )
     }
 }
 
 private extension QuizBuilderQuestionEditorView {
-    func correctSymbol(isCorrect: Bool) -> String {
-        switch draft.type {
-        case .singleChoice:
-            return isCorrect ? "circle.inset.filled" : "circle"
-        case .multipleChoice:
-            return isCorrect ? "checkmark.square.fill" : "square"
-        case .textAnswer:
-            return "circle"
-        }
-    }
-
-    var promptBinding: Binding<String> {
+    func draftField<Value>(
+        _ keyPath: WritableKeyPath<QuizBuilderQuestion, Value>
+    ) -> Binding<Value> {
         Binding(
-            get: { draft.prompt },
+            get: { draft[keyPath: keyPath] },
             set: { newValue in
-                updateDraft {
-                    $0.prompt = String(newValue.prefix(QuizBuilderQuestionLimits.promptMaxLength))
-                }
-            }
-        )
-    }
-
-    var acceptedAnswerBinding: Binding<String> {
-        Binding(
-            get: { draft.acceptedTextAnswer },
-            set: { newValue in
-                updateDraft {
-                    $0.acceptedTextAnswer = String(
-                        newValue.prefix(QuizBuilderQuestionLimits.textAnswerMaxLength)
-                    )
-                }
+                updateDraft { $0[keyPath: keyPath] = newValue }
             }
         )
     }
@@ -256,8 +145,17 @@ private extension QuizBuilderQuestionEditorView {
                 }
             case .multipleChoice:
                 question.options[index].isCorrect.toggle()
-            case .textAnswer:
-                break
+            }
+        }
+    }
+
+    func duplicateOption(at index: Int) {
+        updateDraft { question in
+            guard question.options.indices.contains(index) else { return }
+            guard question.options.count < QuizBuilderQuestionLimits.maximumOptions else { return }
+            question.options.insert(question.options[index].duplicated(), at: index + 1)
+            if question.type == .singleChoice {
+                normalizeSingleChoice(&question)
             }
         }
     }
@@ -269,6 +167,28 @@ private extension QuizBuilderQuestionEditorView {
                 normalizeSingleChoice(&question)
             }
         }
+    }
+
+    func moveOption(droppedIDs: [String], to destinationIndex: Int) -> Bool {
+        guard let rawID = droppedIDs.first,
+              let droppedID = UUID(uuidString: rawID),
+              let fromIndex = draft.options.firstIndex(where: { $0.id == droppedID }),
+              fromIndex != destinationIndex else {
+            return false
+        }
+
+        var toOffset = destinationIndex
+        if fromIndex < destinationIndex {
+            toOffset += 1
+        }
+
+        updateDraft { question in
+            question.options.move(
+                fromOffsets: IndexSet(integer: fromIndex),
+                toOffset: toOffset
+            )
+        }
+        return true
     }
 
     func normalizeSingleChoice(_ question: inout QuizBuilderQuestion) {
