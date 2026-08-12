@@ -15,7 +15,8 @@ enum MainTabRoute: RouteType {
         case .main(let coordinator):
             MainTabView(
                 quizListViewModel: coordinator.makeQuizListViewModel(),
-                resultsViewModel: coordinator.makeResultsViewModel()
+                resultsViewModel: coordinator.makeResultsViewModel(),
+                profileViewModel: coordinator.makeProfileViewModel()
             )
         }
     }

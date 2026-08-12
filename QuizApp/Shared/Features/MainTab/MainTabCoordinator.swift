@@ -16,6 +16,10 @@ class MainTabCoordinatorImpl: Coordinator<MainTabRoute>, MainTabCoordinator {
         ResultsCoordinatorImpl(mainTabCoordinator: self)
     }()
 
+    private lazy var profileCoordinator: ProfileCoordinatorImpl = {
+        ProfileCoordinatorImpl(mainTabCoordinator: self)
+    }()
+
     override func start() async {
         await startFlow(route: .main(coordinator: self))
     }
@@ -36,5 +40,9 @@ class MainTabCoordinatorImpl: Coordinator<MainTabRoute>, MainTabCoordinator {
 
     func makeResultsViewModel() -> ResultsViewModelImpl {
         ResultsViewModelImpl(coordinator: resultsCoordinator)
+    }
+
+    func makeProfileViewModel() -> ProfileViewModelImpl {
+        ProfileViewModelImpl(coordinator: profileCoordinator)
     }
 }

@@ -42,3 +42,35 @@
 "resultsDetail.meta" = "%@ • %@";
 "resultsDetail.shareText" = "%@ — %d%% (%d/%d), +%d XP";
 
+"profile.title" = "Профиль";
+"profile.level" = "Lvl. %d";
+"profile.xp.progress" = "%d / %d XP";
+"profile.xp.remaining" = "До следующего уровня: %d XP";
+"profile.quickStats.streak" = "СЕРИЯ ДНЕЙ";
+"profile.quickStats.streakValue" = "дней подряд";
+"profile.quickStats.coins" = "МОНЕТЫ";
+"profile.quickStats.achievements" = "ДОСТИЖЕНИЯ";
+"profile.quickStats.achievementsValue" = "получено";
+"profile.achievements.title" = "АЧИВКИ";
+"profile.achievements.seeAll" = "Смотреть все";
+"profile.statistics.title" = "СТАТИСТИКА";
+"profile.statistics.quizzesCompleted" = "Пройдено квизов";
+"profile.statistics.accuracy" = "Точность";
+"profile.statistics.quizzesCreated" = "Создано квизов";
+"profile.statistics.globalRank" = "Место в рейтинге";
+"profile.statistics.monthlyDelta" = "+%d за месяц";
+"profile.statistics.accuracyDelta" = "+%d%% за месяц";
+"profile.statistics.topPercent" = "Топ %d%%";
+"profile.statistics.rankValue" = "#%d";
+"profile.tab.myQuizzes" = "МОИ КВИЗЫ";
+"profile.tab.favorites" = "ИЗБРАННОЕ";
+"profile.tab.history" = "ИСТОРИЯ";
+"profile.filter.drafts" = "Черновики (%d)";
+"profile.filter.published" = "Опубликованные (%d)";
+"profile.action.share" = "Поделиться профилем";
+"profile.action.edit" = "Редактировать профиль";
+"profile.shareText" = "%@ (%@) — Уровень %d · %d квизов пройдено";
+"profile.empty.favorites" = "Пока нет избранного";
+"profile.empty.history" = "Пока нет пройденных квизов";
+"profile.empty.quizzes" = "Нет квизов в этом фильтре";
+
