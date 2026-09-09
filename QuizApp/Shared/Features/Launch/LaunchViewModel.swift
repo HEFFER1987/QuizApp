@@ -14,17 +14,15 @@ class LaunchViewModelImpl: LaunchViewModel {
     }
 
     @MainActor func startTimer() async {
-        Task {
-            do {
-                try await Task.sleep(for: .seconds(3))
-                if AppStateManager.shared.authorizationState.isAuthorized {
-                    await coordinator.showMainApp()
-                } else {
-                    await coordinator.showLogin()
-                }
-            } catch {
-                print("Error starting timer: \(error)")
+        do {
+            try await Task.sleep(for: .seconds(3))
+            if AppStateManager.shared.authorizationState.isAuthorized {
+                await coordinator.showMainApp()
+            } else {
+                await coordinator.showLogin()
             }
+        } catch {
+            print("Error starting timer: \(error)")
         }
     }
 

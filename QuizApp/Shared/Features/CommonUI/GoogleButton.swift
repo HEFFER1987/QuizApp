@@ -27,7 +27,7 @@ struct GoogleButton: View {
             // Add a subtle shadow and border, per Google styling
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(Color(.systemGray4), lineWidth: 0.5)
+                    .stroke(Color.gray.opacity(0.35), lineWidth: 0.5)
             )
             .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
         }

@@ -8,13 +8,20 @@ enum QuizListError: Error {
 protocol QuizListViewModel: ObservableObject {
     var filter: QuizListFilter { get set }
     var searchText: String { get set }
+    var selectedQuizID: String? { get set }
     var quizzes: [Quiz] { get }
     var filteredQuizzes: [Quiz] { get }
+    var allCount: Int { get }
+    var draftCount: Int { get }
+    var publishedCount: Int { get }
     var isLoading: Bool { get }
     var error: QuizListError? { get set }
 
     func loadQuizzes() async
     func createQuiz()
+    func selectQuiz(_ quiz: Quiz)
+    func previewQuiz(_ quiz: Quiz)
+    func playQuiz(_ quiz: Quiz)
     func openQuizMenu(quiz: Quiz)
 }
 
@@ -26,9 +33,14 @@ final class QuizListViewModelImpl: QuizListViewModel {
 
     @Published var filter: QuizListFilter = .all
     @Published var searchText: String = ""
+    @Published var selectedQuizID: String?
     @Published private(set) var quizzes: [Quiz] = []
     @Published private(set) var isLoading: Bool = false
     @Published var error: QuizListError?
+
+    var allCount: Int { quizzes.count }
+    var draftCount: Int { quizzes.filter(\.matchesDraftFilter).count }
+    var publishedCount: Int { quizzes.filter(\.matchesPublishedFilter).count }
 
     var filteredQuizzes: [Quiz] {
         quizzes.filter { quiz in
@@ -71,6 +83,21 @@ final class QuizListViewModelImpl: QuizListViewModel {
         }
     }
 
+    func selectQuiz(_ quiz: Quiz) {
+        selectedQuizID = quiz.id
+    }
+
+    func previewQuiz(_ quiz: Quiz) {
+        Logger.shared.log("Preview quiz: \(quiz.title)", level: .info)
+        createQuiz()
+    }
+
+    func playQuiz(_ quiz: Quiz) {
+        Task {
+            await coordinator.playQuiz(quiz)
+        }
+    }
+
     func openQuizMenu(quiz: Quiz) {
         Logger.shared.log("Quiz menu tapped: \(quiz.title)", level: .info)
     }
@@ -79,7 +106,11 @@ final class QuizListViewModelImpl: QuizListViewModel {
 final class QuizListPreviewViewModel: QuizListViewModel {
     @Published var filter: QuizListFilter = .all
     @Published var searchText: String = ""
-    @Published private(set) var quizzes: [Quiz] = QuizListPreviewViewModel.sampleQuizzes
+    @Published var selectedQuizID: String?
+    @Published private(set) var quizzes: [Quiz] = []
+    var allCount: Int { quizzes.count }
+    var draftCount: Int { quizzes.filter(\.matchesDraftFilter).count }
+    var publishedCount: Int { quizzes.filter(\.matchesPublishedFilter).count }
     var filteredQuizzes: [Quiz] {
         quizzes.filter { quiz in
             guard quiz.matchesSearch(searchText) else { return false }
@@ -93,47 +124,16 @@ final class QuizListPreviewViewModel: QuizListViewModel {
     var isLoading: Bool = false
     var error: QuizListError?
 
+    init() {
+        Task {
+            quizzes = (try? await QuizRepositoryMock().fetchQuizzes()) ?? []
+        }
+    }
+
     func loadQuizzes() async {}
     func createQuiz() {}
+    func selectQuiz(_ quiz: Quiz) { selectedQuizID = quiz.id }
+    func previewQuiz(_ quiz: Quiz) {}
+    func playQuiz(_ quiz: Quiz) {}
     func openQuizMenu(quiz: Quiz) {}
-
-    private static let sampleQuizzes: [Quiz] = {
-        let now = Date()
-        let calendar = Calendar.current
-        return [
-            Quiz(
-                id: "1",
-                title: "English Grammar",
-                subtitle: "Intermediate",
-                questionCount: 12,
-                status: .draft,
-                iconName: "book.fill",
-                updatedAt: calendar.date(byAdding: .hour, value: -2, to: now),
-                attemptCount: nil,
-                averageScorePercent: nil
-            ),
-            Quiz(
-                id: "2",
-                title: "World History",
-                subtitle: nil,
-                questionCount: 20,
-                status: .published,
-                iconName: "globe.americas.fill",
-                updatedAt: nil,
-                attemptCount: 24,
-                averageScorePercent: 82
-            ),
-            Quiz(
-                id: "3",
-                title: "Swift Basics",
-                subtitle: nil,
-                questionCount: 15,
-                status: .draft,
-                iconName: "chevron.left.forwardslash.chevron.right",
-                updatedAt: calendar.date(byAdding: .day, value: -1, to: now),
-                attemptCount: nil,
-                averageScorePercent: nil
-            )
-        ]
-    }()
 }

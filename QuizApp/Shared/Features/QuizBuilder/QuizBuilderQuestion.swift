@@ -1,9 +1,10 @@
 import Foundation
 import SwiftUI
 
-enum QuizBuilderQuestionType: String, CaseIterable, Identifiable, Equatable {
+enum QuizBuilderQuestionType: String, CaseIterable, Identifiable, Equatable, Codable {
     case singleChoice
     case multipleChoice
+    case textAnswer
 
     var id: String { rawValue }
 
@@ -11,6 +12,7 @@ enum QuizBuilderQuestionType: String, CaseIterable, Identifiable, Equatable {
         switch self {
         case .singleChoice: return Strings.QuizBuilder.QuestionType.singleChoice
         case .multipleChoice: return Strings.QuizBuilder.QuestionType.multipleChoice
+        case .textAnswer: return Strings.QuizBuilder.QuestionType.textAnswer
         }
     }
 
@@ -18,12 +20,13 @@ enum QuizBuilderQuestionType: String, CaseIterable, Identifiable, Equatable {
         switch self {
         case .singleChoice: return "circle.inset.filled"
         case .multipleChoice: return "checkmark.square.fill"
+        case .textAnswer: return "textformat"
         }
     }
 
     var usesOrangeAccent: Bool {
         switch self {
-        case .singleChoice: return true
+        case .singleChoice, .textAnswer: return true
         case .multipleChoice: return false
         }
     }
@@ -61,6 +64,7 @@ struct QuizBuilderQuestion: Identifiable, Equatable, Hashable {
     var explanation: String
     var points: Int
     var shuffleAnswers: Bool
+    var difficulty: String
 
     init(
         id: UUID = UUID(),
@@ -72,7 +76,8 @@ struct QuizBuilderQuestion: Identifiable, Equatable, Hashable {
         ],
         explanation: String = "",
         points: Int = QuizBuilderQuestionLimits.minimumPoints,
-        shuffleAnswers: Bool = true
+        shuffleAnswers: Bool = true,
+        difficulty: String = "Medium"
     ) {
         self.id = id
         self.prompt = prompt
@@ -81,22 +86,31 @@ struct QuizBuilderQuestion: Identifiable, Equatable, Hashable {
         self.explanation = explanation
         self.points = points
         self.shuffleAnswers = shuffleAnswers
+        self.difficulty = difficulty
     }
 
     var isValid: Bool {
         let trimmedPrompt = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedPrompt.isEmpty else { return false }
 
-        let filled = options.filter {
-            !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        }
-        guard filled.count >= QuizBuilderQuestionLimits.minimumOptions else { return false }
-
         switch type {
-        case .singleChoice:
-            return filled.filter(\.isCorrect).count == 1
-        case .multipleChoice:
-            return filled.contains(where: \.isCorrect)
+        case .textAnswer:
+            let accepted = options.first?.text.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return !accepted.isEmpty
+        case .singleChoice, .multipleChoice:
+            let filled = options.filter {
+                !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            }
+            guard filled.count >= QuizBuilderQuestionLimits.minimumOptions else { return false }
+
+            switch type {
+            case .singleChoice:
+                return filled.filter(\.isCorrect).count == 1
+            case .multipleChoice:
+                return filled.contains(where: \.isCorrect)
+            case .textAnswer:
+                return false
+            }
         }
     }
 
@@ -107,7 +121,8 @@ struct QuizBuilderQuestion: Identifiable, Equatable, Hashable {
             options: options.map { $0.duplicated() },
             explanation: explanation,
             points: points,
-            shuffleAnswers: shuffleAnswers
+            shuffleAnswers: shuffleAnswers,
+            difficulty: difficulty
         )
     }
 }

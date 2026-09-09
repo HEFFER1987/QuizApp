@@ -16,6 +16,8 @@ enum LoginError: Error {
 protocol LoginViewModel: ObservableObject {
     var email: String { get set }
     var password: String { get set }
+    var isLoading: Bool { get }
+    var error: LoginError? { get }
 
     func login()
     func signUp()
@@ -32,15 +34,12 @@ final class LoginViewModelImpl: AuthViewModelBase, LoginViewModel {
     init(
         coordinator: LoginCoordinator,
         authManager: AuthManager = AuthManagerImp(),
-        googleSignInProvider: GoogleSignInProviding = GoogleSignInProvider(),
-        presentingViewControllerProvider: PresentingViewControllerProviding =
-            UIApplicationTopViewControllerProvider()
+        googleSignInProvider: GoogleSignInProviding = GoogleSignInProvider()
     ) {
         self.coordinator = coordinator
         super.init(
             authManager: authManager,
-            googleSignInProvider: googleSignInProvider,
-            presentingViewControllerProvider: presentingViewControllerProvider
+            googleSignInProvider: googleSignInProvider
         )
     }
 
@@ -56,12 +55,13 @@ final class LoginViewModelImpl: AuthViewModelBase, LoginViewModel {
             self.error = .passwordEmpty
             return
         }
-        self.isLoading = true
-        defer {
-            self.isLoading = false
-        }
 
-        Task {
+        Task { @MainActor in
+            guard !isLoading else { return }
+            isLoading = true
+            error = nil
+            defer { isLoading = false }
+
             do {
                 let userId = try await authManager.signIn(method: .email(email: email, password: password))
                 await handleAuthSuccess(userId: userId, provider: .email)
@@ -157,12 +157,40 @@ final class LoginViewModelImpl: AuthViewModelBase, LoginViewModel {
     }
 }
 
+extension LoginError {
+    var userMessage: String {
+        switch self {
+        case .emailEmpty:
+            return "Enter your email address."
+        case .passwordEmpty:
+            return "Enter your password."
+        case .appleIDCredentialEmpty, .rawNonceEmpty, .idTokenEmpty:
+            return "Apple sign in failed. Please try again."
+        case .accessTokenEmpty:
+            return "Google sign in failed. Please try again."
+        case .googleConfigurationMissing:
+            return "Google sign in is not configured."
+        case .authentificationService(let error):
+            return error.localizedDescription
+        case .firebase(let error):
+            let nsError = error as NSError
+            if nsError.code == 17995 {
+                return "Keychain access failed. Rebuild the app with code signing enabled."
+            }
+            if nsError.code == 17004 {
+                return "Invalid email or password. Check your credentials or create a new account via Sign Up."
+            }
+            return error.localizedDescription
+        }
+    }
+}
+
 private extension GoogleSignInError {
     var toLoginError: LoginError {
         switch self {
         case .configurationMissing:
             return .googleConfigurationMissing
-        case .noPresentingViewController:
+        case .noPresentingContext:
             return .authentificationService(error: self)
         case .idTokenEmpty:
             return .idTokenEmpty

@@ -20,7 +20,9 @@ struct ResultDetailView<ViewModel: ResultDetailViewModel>: View {
                 content
             }
         }
+        #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
+        #endif
         .task {
             await viewModel.load()
         }

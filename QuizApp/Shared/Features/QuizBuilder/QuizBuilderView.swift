@@ -18,7 +18,9 @@ struct QuizBuilderView<ViewModel: QuizBuilderViewModel>: View {
                 wizardContent
             }
         }
+        #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
+        #endif
         .sheet(item: questionEditorBinding) { _ in
             QuizBuilderQuestionEditorView(viewModel: viewModel)
         }

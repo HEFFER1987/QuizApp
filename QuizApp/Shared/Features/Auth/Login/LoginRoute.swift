@@ -7,7 +7,7 @@ enum LoginRoute: RouteType {
     case signup(coordinator: SignUpCoordinator)
 
     var presentationStyle: TransitionPresentationStyle {
-        .custom(transition: .identity, animation: .default, fullScreen: true)
+        .platformRootFlow
     }
 
     @ViewBuilder

@@ -26,6 +26,11 @@ struct SignUpView<ViewModel: SignUpViewModel>: View {
                 .shadow(color: .black.opacity(0.35), radius: 10, x: 0, y: 6)
                 .padding(.bottom, 12)
 
+            if let error = viewModel.error {
+                AuthFormErrorBanner(message: error.userMessage)
+                    .padding(.bottom, 4)
+            }
+
             VStack(spacing: 14) {
                 CommonTextField(
                     placeholder: Strings.Common.Email.placeholder,
@@ -68,6 +73,8 @@ struct SignUpView<ViewModel: SignUpViewModel>: View {
                 ) {
                     viewModel.signUp()
                 }
+                .disabled(viewModel.isLoading)
+                .opacity(viewModel.isLoading ? 0.6 : 1)
 
                 GoogleButton(title: Strings.Signup.Google.button) {
                     viewModel.signUpWithGoogle()
@@ -100,6 +107,25 @@ struct SignUpView<ViewModel: SignUpViewModel>: View {
         }
     }
 
+}
+
+private struct AuthFormErrorBanner: View {
+    let message: String
+
+    var body: some View {
+        Text(message)
+            .font(.system(size: 14, weight: .medium, design: .rounded))
+            .foregroundStyle(.white)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color.red.opacity(0.85))
+            )
+            .padding(.horizontal, 20)
+    }
 }
 
 private enum Field: Hashable {

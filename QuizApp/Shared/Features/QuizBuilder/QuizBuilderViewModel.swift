@@ -107,6 +107,14 @@ protocol QuizBuilderViewModel: ObservableObject {
     func goToPreviewQuestion(at index: Int)
     func previewGoNext()
     func previewGoBack()
+
+    var difficulty: String { get set }
+    var tagsText: String { get set }
+    var selectedQuestionID: UUID? { get set }
+    var selectedQuestion: QuizBuilderQuestion? { get }
+
+    func selectQuestion(_ question: QuizBuilderQuestion?)
+    func ensureSelectionAfterChanges()
 }
 
 enum QuizBuilderLimits {
@@ -138,8 +146,11 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
     @Published var selectedCover: QuizCoverOption = .graduationCap
     @Published var category: QuizCategoryOption? = .education
     @Published var language: QuizLanguageOption = .english
+    @Published var difficulty: String = "Medium"
+    @Published var tagsText: String = ""
     @Published private(set) var questions: [QuizBuilderQuestion] = []
     @Published var questionEditor: QuizBuilderQuestionEditorState?
+    @Published var selectedQuestionID: UUID?
     @Published private(set) var previewQuestionIndex: Int = 0
     @Published private var previewSelectedOptionIDs: [UUID: Set<UUID>] = [:]
     @Published private var previewBookmarkedQuestionIDs: Set<UUID> = []
@@ -187,6 +198,11 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
         return previewBookmarkedQuestionIDs.contains(questionID)
     }
 
+    var selectedQuestion: QuizBuilderQuestion? {
+        guard let selectedQuestionID else { return nil }
+        return questions.first { $0.id == selectedQuestionID }
+    }
+
     var canGoNext: Bool {
         switch currentStep {
         case .quizDetails:
@@ -232,6 +248,7 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
     func addQuestion() {
         let draft = QuizBuilderQuestion()
         questions.append(draft)
+        selectQuestion(draft)
         questionEditor = QuizBuilderQuestionEditorState(
             draft: draft,
             isNew: true
@@ -239,10 +256,23 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
     }
 
     func editQuestion(_ question: QuizBuilderQuestion) {
+        selectQuestion(question)
         questionEditor = QuizBuilderQuestionEditorState(
             draft: question,
             isNew: false
         )
+    }
+
+    func selectQuestion(_ question: QuizBuilderQuestion?) {
+        selectedQuestionID = question?.id
+    }
+
+    func ensureSelectionAfterChanges() {
+        if let selectedQuestionID,
+           questions.contains(where: { $0.id == selectedQuestionID }) {
+            return
+        }
+        selectedQuestionID = questions.first?.id
     }
 
     func duplicateQuestion(_ question: QuizBuilderQuestion) {
@@ -251,10 +281,12 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
 
     func deleteQuestion(_ question: QuizBuilderQuestion) {
         questions.removeAll { $0.id == question.id }
+        ensureSelectionAfterChanges()
     }
 
     func deleteAllQuestions() {
         questions.removeAll()
+        selectedQuestionID = nil
     }
 
     func moveQuestions(from source: IndexSet, to destination: Int) {
@@ -290,7 +322,7 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
         var selections = previewSelectedOptionIDs
         var selected = selections[question.id] ?? []
         switch question.type {
-        case .singleChoice:
+        case .singleChoice, .textAnswer:
             selected = [optionID]
         case .multipleChoice:
             if selected.contains(optionID) {

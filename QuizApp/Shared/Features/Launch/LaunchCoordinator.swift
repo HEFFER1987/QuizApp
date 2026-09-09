@@ -21,18 +21,21 @@ class LaunchCoordinatorImpl: Coordinator<LaunchRoute>, LaunchCoordinator {
 
     func showLogin() async {
         let coordinator = LoginCoordinatorImpl()
-//        await navigate(toRoute: .login(coordinator: coordinator))
         await navigate(
             to: coordinator,
-            presentationStyle: .custom(transition: .identity, animation: .default, fullScreen: true)
+            presentationStyle: .platformRootFlow
         )
     }
 
     func showMainApp() async {
+        #if os(macOS)
+        let coordinator = MacRootCoordinatorImpl()
+        #else
         let coordinator = MainTabCoordinatorImpl()
+        #endif
         await navigate(
             to: coordinator,
-            presentationStyle: .custom(transition: .identity, animation: .default, fullScreen: true)
+            presentationStyle: .platformRootFlow
         )
     }
 }

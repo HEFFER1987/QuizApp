@@ -4,6 +4,7 @@ enum ResultsFilter: CaseIterable, Equatable, Hashable {
     case all
     case excellent
     case needsReview
+    case createdByMe
     case composite
 }
 
@@ -33,6 +34,7 @@ struct ResultsSummary: Equatable {
     let quizzesCompleted: Int
     let totalAttempts: Int
     let streakDays: Int
+    let globalRank: Int
 }
 
 extension QuizResult {
@@ -48,6 +50,10 @@ extension QuizResult {
         isComposite
     }
 
+    var matchesCreatedByMeFilter: Bool {
+        true
+    }
+
     func matches(_ filter: ResultsFilter) -> Bool {
         switch filter {
         case .all:
@@ -56,6 +62,8 @@ extension QuizResult {
             return matchesExcellentFilter
         case .needsReview:
             return matchesNeedsReviewFilter
+        case .createdByMe:
+            return matchesCreatedByMeFilter
         case .composite:
             return matchesCompositeFilter
         }

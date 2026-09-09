@@ -41,9 +41,11 @@ struct QuizBuilderQuestionEditorView<ViewModel: QuizBuilderViewModel>: View {
                 }
             }
             .navigationTitle(Strings.QuizBuilder.Editor.title)
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { editorToolbar }
             .toolbarBackground(.hidden, for: .navigationBar)
+            #endif
+            .toolbar { editorToolbar }
             .alert(
                 Strings.QuizBuilder.Editor.tipsTitle,
                 isPresented: $showTips
@@ -53,8 +55,10 @@ struct QuizBuilderQuestionEditorView<ViewModel: QuizBuilderViewModel>: View {
                 Text(Strings.QuizBuilder.Editor.tipsMessage)
             }
         }
+        #if os(iOS)
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
+        #endif
     }
 
     @ToolbarContentBuilder
@@ -145,6 +149,8 @@ private extension QuizBuilderQuestionEditorView {
                 }
             case .multipleChoice:
                 question.options[index].isCorrect.toggle()
+            case .textAnswer:
+                break
             }
         }
     }

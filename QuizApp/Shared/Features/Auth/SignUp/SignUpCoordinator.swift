@@ -30,9 +30,16 @@ class SignUpCoordinatorImpl: Coordinator<DefaultRoute>, SignUpCoordinator {
             return
         }
 
+        #if os(macOS)
+        await navigate(
+            to: MacRootCoordinatorImpl(),
+            presentationStyle: .platformModalFlow
+        )
+        #else
         await navigate(
             to: MainTabCoordinatorImpl(),
-            presentationStyle: .fullScreenCover
+            presentationStyle: .platformModalFlow
         )
+        #endif
     }
 }

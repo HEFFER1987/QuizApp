@@ -6,7 +6,7 @@ enum MainTabRoute: RouteType {
     case main(coordinator: MainTabCoordinatorImpl)
 
     var presentationStyle: TransitionPresentationStyle {
-        .custom(transition: .identity, animation: .default, fullScreen: true)
+        .platformRootFlow
     }
 
     @ViewBuilder

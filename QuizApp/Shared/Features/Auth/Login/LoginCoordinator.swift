@@ -18,7 +18,12 @@ class LoginCoordinatorImpl: Coordinator<LoginRoute>, LoginCoordinator {
     }
 
     func showMainApp() async {
+        #if os(macOS)
+        let coordinator = MacRootCoordinatorImpl()
+        await navigate(to: coordinator, presentationStyle: .platformModalFlow)
+        #else
         let coordinator = MainTabCoordinatorImpl()
-        await navigate(to: coordinator, presentationStyle: .fullScreenCover)
+        await navigate(to: coordinator, presentationStyle: .platformModalFlow)
+        #endif
     }
 }
