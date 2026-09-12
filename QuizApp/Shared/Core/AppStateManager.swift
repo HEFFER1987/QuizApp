@@ -79,6 +79,15 @@ final class AppStateManager: ObservableObject {
         )
         persistState()
     }
+
+    func clearAuthorizationState() {
+        authorizationState = .unauthorized(
+            previousProvider: nil,
+            previousUserId: nil,
+            reason: .neverSignedIn
+        )
+        userDefaults.removeObject(forKey: Self.stateStorageKey)
+    }
 }
 
 // MARK: - Storage

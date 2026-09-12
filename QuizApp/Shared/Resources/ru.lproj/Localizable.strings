@@ -1,4 +1,7 @@
 "login.welcome.title" = "С возвращением!";
+"login.welcome.subtitle" = "Войдите в аккаунт и продолжите путь к знаниям";
+"login.continueWith" = "Или продолжить через";
+"login.apple.button" = "Войти через Apple";
 "login.email.placeholder" = "Эл. почта";
 "login.password.placeholder" = "Пароль";
 "login.action.login" = "Войти";

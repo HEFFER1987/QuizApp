@@ -6,6 +6,10 @@ protocol LaunchCoordinator {
     func showLogs() async
     func showLogin() async
     func showMainApp() async
+    #if os(macOS)
+    func makeLoginCoordinator() async -> LoginCoordinatorImpl
+    func showSignUp(from loginCoordinator: LoginCoordinatorImpl) async
+    #endif
 }
 
 class LaunchCoordinatorImpl: Coordinator<LaunchRoute>, LaunchCoordinator {
@@ -38,4 +42,26 @@ class LaunchCoordinatorImpl: Coordinator<LaunchRoute>, LaunchCoordinator {
             presentationStyle: .platformRootFlow
         )
     }
+
+    #if os(macOS)
+    func makeLoginCoordinator() async -> LoginCoordinatorImpl {
+        let coordinator = LoginCoordinatorImpl()
+        coordinator.parent = self
+        children.append(coordinator)
+        // macOS presents MacLoginView at app window level via MacLaunchUIState.
+        // Starting the login flow here would open a sheet with a second MacLoginView
+        // that collapses to decorations-only and covers the app-level login UI.
+        return coordinator
+    }
+
+    func showSignUp(from loginCoordinator: LoginCoordinatorImpl) async {
+        let coordinator = SignUpCoordinatorImpl()
+        loginCoordinator.children.append(coordinator)
+        coordinator.parent = loginCoordinator
+        await navigate(
+            to: coordinator,
+            presentationStyle: .platformModalFlow
+        )
+    }
+    #endif
 }

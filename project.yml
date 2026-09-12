@@ -278,4 +278,6 @@ schemes:
                 QuizApp-macOS: all
         run:
             config: Debug
+            commandLineArguments:
+                "-resetLogin": false
 

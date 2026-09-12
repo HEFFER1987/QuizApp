@@ -15,9 +15,13 @@ enum LaunchRoute: RouteType {
     var body: some View {
         switch self {
         case .main(let coordinator):
-            LaunchView(viewModel: LaunchViewModelImpl(coordinator: coordinator))
+            LaunchView(coordinator: coordinator)
         case .login(let coordinator):
+            #if os(macOS)
+            MacLoginView(viewModel: LoginViewModelImpl(coordinator: coordinator))
+            #else
             LoginView(viewModel: LoginViewModelImpl(coordinator: coordinator))
+            #endif
         case .logs(let coordinator):
             LogsView(viewModel: LogsViewModelImpl(coordinator: coordinator))
         }
@@ -26,10 +30,10 @@ enum LaunchRoute: RouteType {
 
 extension TransitionPresentationStyle {
     /// Replaces the current root flow (Launch → Login/Main).
-    /// SUICoordinator's fullScreen container is a no-op on macOS.
+    /// SUICoordinator's custom/fullScreen containers are no-ops on macOS, so use `.sheet`.
     static var platformRootFlow: TransitionPresentationStyle {
         #if os(macOS)
-        .custom(transition: .identity, animation: .default, fullScreen: false)
+        .sheet
         #else
         .custom(transition: .identity, animation: .default, fullScreen: true)
         #endif
@@ -38,7 +42,7 @@ extension TransitionPresentationStyle {
     /// Presents a coordinator modally over the auth stack.
     static var platformModalFlow: TransitionPresentationStyle {
         #if os(macOS)
-        .custom(transition: .identity, animation: .default, fullScreen: false)
+        .sheet
         #else
         .fullScreenCover
         #endif
