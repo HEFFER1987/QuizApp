@@ -29,8 +29,8 @@ enum LaunchRoute: RouteType {
 }
 
 extension TransitionPresentationStyle {
-    /// Replaces the current root flow (Launch → Login/Main).
-    /// SUICoordinator's custom/fullScreen containers are no-ops on macOS, so use `.sheet`.
+    /// Replaces the current root flow (Launch → Login/Main) on iOS.
+    /// On macOS, root screens are presented at the app window level via `MacLaunchUIState`.
     static var platformRootFlow: TransitionPresentationStyle {
         #if os(macOS)
         .sheet

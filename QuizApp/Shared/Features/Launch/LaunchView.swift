@@ -27,11 +27,6 @@ struct LaunchView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onChange(of: appState.authorizationState.isAuthorized) { _, isAuthorized in
-            if isAuthorized {
-                viewModel.hideLaunchContent()
-            }
-        }
     }
     #endif
 

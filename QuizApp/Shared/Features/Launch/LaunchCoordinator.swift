@@ -34,13 +34,17 @@ class LaunchCoordinatorImpl: Coordinator<LaunchRoute>, LaunchCoordinator {
     func showMainApp() async {
         #if os(macOS)
         let coordinator = MacRootCoordinatorImpl()
+        await coordinator.start()
+        await MainActor.run {
+            MacLaunchUIState.shared.presentMain(with: coordinator)
+        }
         #else
         let coordinator = MainTabCoordinatorImpl()
-        #endif
         await navigate(
             to: coordinator,
             presentationStyle: .platformRootFlow
         )
+        #endif
     }
 
     #if os(macOS)

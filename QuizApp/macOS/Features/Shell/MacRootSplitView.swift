@@ -15,11 +15,12 @@ struct MacRootSplitView: View {
             .navigationSplitViewColumnWidth(min: 210, ideal: 230, max: 260)
         } content: {
             contentColumn
-                .navigationSplitViewColumnWidth(min: 480, ideal: 620, max: 900)
+                .navigationSplitViewColumnWidth(min: 480, ideal: 720, max: 1200)
         } detail: {
             inspectorColumn
-                .navigationSplitViewColumnWidth(min: 280, ideal: 320, max: 360)
+                .navigationSplitViewColumnWidth(min: 280, ideal: 320, max: 380)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(MacSpaceBackgroundView())
         .sheet(isPresented: $viewModel.showQuizDetailsPanel) {
             MacQuizDetailsPanel(viewModel: viewModel.quizBuilderViewModel)

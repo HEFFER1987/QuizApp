@@ -19,8 +19,10 @@ final class MacLaunchUIState: ObservableObject {
     }
 
     @Published private(set) var authScreen: AuthScreen?
+    @Published private(set) var mainCoordinator: MacRootCoordinatorImpl?
 
     var isShowingAuth: Bool { authScreen != nil }
+    var isShowingMain: Bool { mainCoordinator != nil }
 
     func presentLogin(with coordinator: LoginCoordinatorImpl) {
         authScreen = .login(coordinator)
@@ -32,6 +34,11 @@ final class MacLaunchUIState: ObservableObject {
 
     func dismissAuth() {
         authScreen = nil
+    }
+
+    func presentMain(with coordinator: MacRootCoordinatorImpl) {
+        dismissAuth()
+        mainCoordinator = coordinator
     }
 
     func backToLogin() {

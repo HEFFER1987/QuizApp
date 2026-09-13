@@ -30,7 +30,10 @@ class LoginCoordinatorImpl: Coordinator<LoginRoute>, LoginCoordinator {
             return
         }
         let coordinator = MacRootCoordinatorImpl()
-        await navigate(to: coordinator, presentationStyle: .platformRootFlow)
+        await coordinator.start()
+        await MainActor.run {
+            MacLaunchUIState.shared.presentMain(with: coordinator)
+        }
         #else
         let coordinator = MainTabCoordinatorImpl()
         await navigate(to: coordinator, presentationStyle: .platformModalFlow)

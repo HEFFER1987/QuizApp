@@ -12,28 +12,22 @@ struct QuizAppApp: App {
     var body: some Scene {
         WindowGroup {
             GeometryReader { window in
-                ZStack(alignment: .topLeading) {
+                ZStack {
                     MacSpaceBackgroundView()
                         .frame(width: window.size.width, height: window.size.height)
 
-                    coordinator.getView()
-                        .frame(width: window.size.width, height: window.size.height)
-
-                    if let authScreen = launchUI.authScreen {
-                        Group {
-                            switch authScreen {
-                            case .login(let loginCoordinator):
-                                MacLoginView(viewModel: LoginViewModelImpl(coordinator: loginCoordinator))
-                            case .signup(let signUpCoordinator):
-                                MacSignUpView(viewModel: SignUpViewModelImpl(coordinator: signUpCoordinator))
-                            }
-                        }
-                        .frame(width: window.size.width, height: window.size.height, alignment: .top)
-                        .zIndex(1)
+                    if let mainCoordinator = launchUI.mainCoordinator {
+                        MacRootSplitView(viewModel: mainCoordinator.makeRootViewModel())
+                            .frame(width: window.size.width, height: window.size.height)
+                    } else if let authScreen = launchUI.authScreen {
+                        authView(for: authScreen)
+                            .frame(width: window.size.width, height: window.size.height, alignment: .top)
+                    } else {
+                        coordinator.getView()
+                            .frame(width: window.size.width, height: window.size.height)
                     }
                 }
-                .frame(width: window.size.width, height: window.size.height, alignment: .topLeading)
-                .clipped()
+                .frame(width: window.size.width, height: window.size.height)
             }
             .frame(minWidth: 1100, minHeight: 720)
         }
@@ -41,6 +35,16 @@ struct QuizAppApp: App {
 
         Settings {
             MacSettingsView(viewModel: SettingsViewModelImpl())
+        }
+    }
+
+    @ViewBuilder
+    private func authView(for authScreen: MacLaunchUIState.AuthScreen) -> some View {
+        switch authScreen {
+        case .login(let loginCoordinator):
+            MacLoginView(viewModel: LoginViewModelImpl(coordinator: loginCoordinator))
+        case .signup(let signUpCoordinator):
+            MacSignUpView(viewModel: SignUpViewModelImpl(coordinator: signUpCoordinator))
         }
     }
 }

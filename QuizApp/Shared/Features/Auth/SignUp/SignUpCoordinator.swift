@@ -35,10 +35,11 @@ class SignUpCoordinatorImpl: Coordinator<DefaultRoute>, SignUpCoordinator {
         }
 
         #if os(macOS)
-        await navigate(
-            to: MacRootCoordinatorImpl(),
-            presentationStyle: .platformModalFlow
-        )
+        let coordinator = MacRootCoordinatorImpl()
+        await coordinator.start()
+        await MainActor.run {
+            MacLaunchUIState.shared.presentMain(with: coordinator)
+        }
         #else
         await navigate(
             to: MainTabCoordinatorImpl(),
