@@ -4,15 +4,41 @@ import SwiftUI
 final class MacLaunchUIState: ObservableObject {
     static let shared = MacLaunchUIState()
 
-    @Published private(set) var loginCoordinator: LoginCoordinatorImpl?
+    enum AuthScreen: Equatable {
+        case login(LoginCoordinatorImpl)
+        case signup(SignUpCoordinatorImpl)
 
-    var isShowingLogin: Bool { loginCoordinator != nil }
-
-    func presentLogin(with coordinator: LoginCoordinatorImpl) {
-        loginCoordinator = coordinator
+        static func == (lhs: AuthScreen, rhs: AuthScreen) -> Bool {
+            switch (lhs, rhs) {
+            case (.login, .login), (.signup, .signup):
+                return true
+            default:
+                return false
+            }
+        }
     }
 
-    func dismissLogin() {
-        loginCoordinator = nil
+    @Published private(set) var authScreen: AuthScreen?
+
+    var isShowingAuth: Bool { authScreen != nil }
+
+    func presentLogin(with coordinator: LoginCoordinatorImpl) {
+        authScreen = .login(coordinator)
+    }
+
+    func presentSignUp(with coordinator: SignUpCoordinatorImpl) {
+        authScreen = .signup(coordinator)
+    }
+
+    func dismissAuth() {
+        authScreen = nil
+    }
+
+    func backToLogin() {
+        guard case .signup(let signUpCoordinator) = authScreen,
+              let loginCoordinator = signUpCoordinator.parent as? LoginCoordinatorImpl else {
+            return
+        }
+        authScreen = .login(loginCoordinator)
     }
 }

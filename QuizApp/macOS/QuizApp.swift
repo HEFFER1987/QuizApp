@@ -19,10 +19,17 @@ struct QuizAppApp: App {
                     coordinator.getView()
                         .frame(width: window.size.width, height: window.size.height)
 
-                    if let loginCoordinator = launchUI.loginCoordinator {
-                        MacLoginView(viewModel: LoginViewModelImpl(coordinator: loginCoordinator))
-                            .frame(width: window.size.width, height: window.size.height, alignment: .top)
-                            .zIndex(1)
+                    if let authScreen = launchUI.authScreen {
+                        Group {
+                            switch authScreen {
+                            case .login(let loginCoordinator):
+                                MacLoginView(viewModel: LoginViewModelImpl(coordinator: loginCoordinator))
+                            case .signup(let signUpCoordinator):
+                                MacSignUpView(viewModel: SignUpViewModelImpl(coordinator: signUpCoordinator))
+                            }
+                        }
+                        .frame(width: window.size.width, height: window.size.height, alignment: .top)
+                        .zIndex(1)
                     }
                 }
                 .frame(width: window.size.width, height: window.size.height, alignment: .topLeading)

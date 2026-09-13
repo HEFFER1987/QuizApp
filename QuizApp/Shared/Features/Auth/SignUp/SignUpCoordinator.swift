@@ -19,6 +19,10 @@ class SignUpCoordinatorImpl: Coordinator<DefaultRoute>, SignUpCoordinator {
     }
 
     func moveBackToLogin() async {
+        #if os(macOS)
+        MacLaunchUIState.shared.backToLogin()
+        return
+        #endif
         await finishFlow(animated: true)
     }
 

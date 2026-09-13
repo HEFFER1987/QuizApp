@@ -116,14 +116,34 @@ private extension AppLanguage {
 
 struct MacAuthWelcomeTitle: View {
     var body: some View {
-        let title = Strings.Login.Welcome.title
-        if let range = title.range(of: "Back!") {
+        MacAuthSplitTitle(
+            title: Strings.Login.Welcome.title,
+            highlight: "Back!"
+        )
+    }
+}
+
+struct MacAuthCreateTitle: View {
+    var body: some View {
+        MacAuthSplitTitle(
+            title: Strings.Signup.Create.title,
+            highlight: "Account"
+        )
+    }
+}
+
+private struct MacAuthSplitTitle: View {
+    let title: String
+    let highlight: String
+
+    var body: some View {
+        if let range = title.range(of: highlight) {
             let prefix = String(title[..<range.lowerBound])
-            let highlight = String(title[range.lowerBound...])
+            let highlighted = String(title[range.lowerBound...])
             HStack(spacing: 0) {
                 Text(prefix)
                     .foregroundStyle(.white)
-                Text(highlight)
+                Text(highlighted)
                     .foregroundStyle(QuizTheme.publishedGlow)
             }
             .font(.system(size: 34, weight: .bold, design: .rounded))
@@ -333,10 +353,12 @@ enum MacAuthOutlineButtonIcon {
 }
 
 struct MacAuthDivider: View {
+    var label: String = Strings.Login.continueWith
+
     var body: some View {
         HStack(spacing: 12) {
             line
-            Text(Strings.Login.continueWith)
+            Text(label)
                 .font(.system(size: 13, weight: .medium, design: .rounded))
                 .foregroundStyle(QuizTheme.mutedText)
             line

@@ -9,10 +9,15 @@
 
 "logs.title" = "Logs";
 
-"signup.create.title" = "Create account";
+"signup.create.title" = "Create Account";
+"signup.create.subtitle" = "Join QUIZ and start creating, taking and sharing amazing quizzes!";
 "signup.confirm.password.placeholder" = "Confirm password";
+"signup.continueWith" = "Or";
 "signup.action.back" = "Already have an account? Log in";
+"signup.action.alreadyHaveAccount" = "Already have an account?";
+"signup.action.login" = "Log in";
 "signup.google.button" = "Sign up with Google";
+"signup.apple.button" = "Sign up with Apple";
 
 "common.email.placeholder" = "Email";
 "common.password.placeholder" = "Password";

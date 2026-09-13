@@ -6,6 +6,19 @@
 "login.password.placeholder" = "Пароль";
 "login.action.login" = "Войти";
 "login.action.signup" = "Регистрация";
+
+"signup.create.title" = "Создать аккаунт";
+"signup.create.subtitle" = "Присоединяйтесь к QUIZ и создавайте, проходите и делитесь удивительными квизами!";
+"signup.confirm.password.placeholder" = "Подтвердите пароль";
+"signup.continueWith" = "Или";
+"signup.action.back" = "Уже есть аккаунт? Войти";
+"signup.action.alreadyHaveAccount" = "Уже есть аккаунт?";
+"signup.action.login" = "Войти";
+"signup.google.button" = "Регистрация через Google";
+"signup.apple.button" = "Регистрация через Apple";
+"common.email.placeholder" = "Эл. почта";
+"common.password.placeholder" = "Пароль";
+"common.action.signup" = "Регистрация";
 "login.google.button" = "Войти через Google";
 "login.password.hide" = "Скрыть пароль";
 "login.password.show" = "Показать пароль";

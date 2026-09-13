@@ -20,7 +20,11 @@ enum LoginRoute: RouteType {
             LoginView(viewModel: LoginViewModelImpl(coordinator: coordinator))
             #endif
         case .signup(let coordinator):
+            #if os(macOS)
+            MacSignUpView(viewModel: SignUpViewModelImpl(coordinator: coordinator))
+            #else
             SignUpView(viewModel: SignUpViewModelImpl(coordinator: coordinator))
+            #endif
         }
     }
 }

@@ -25,7 +25,7 @@ final class LaunchViewModelImpl: LaunchViewModel {
     @Published private(set) var macLaunchContent: MacLaunchContent = .splash
 
     func hideLaunchContent() {
-        MacLaunchUIState.shared.dismissLogin()
+        MacLaunchUIState.shared.dismissAuth()
         macLaunchContent = .hidden
     }
     #endif

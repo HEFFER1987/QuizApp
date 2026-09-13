@@ -58,10 +58,7 @@ class LaunchCoordinatorImpl: Coordinator<LaunchRoute>, LaunchCoordinator {
         let coordinator = SignUpCoordinatorImpl()
         loginCoordinator.children.append(coordinator)
         coordinator.parent = loginCoordinator
-        await navigate(
-            to: coordinator,
-            presentationStyle: .platformModalFlow
-        )
+        MacLaunchUIState.shared.presentSignUp(with: coordinator)
     }
     #endif
 }
