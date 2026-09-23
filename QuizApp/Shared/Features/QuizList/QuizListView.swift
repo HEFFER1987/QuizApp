@@ -60,8 +60,7 @@ struct QuizListView<ViewModel: QuizListViewModel>: View {
     private var quizListContent: some View {
         if viewModel.isLoading && viewModel.quizzes.isEmpty {
             Spacer()
-            ProgressView()
-                .tint(.white)
+            CometSpinnerView()
                 .frame(maxWidth: .infinity)
             Spacer()
         } else {

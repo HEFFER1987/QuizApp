@@ -51,8 +51,7 @@ struct ResultsView<ViewModel: ResultsViewModel>: View {
     private var resultsListContent: some View {
         if viewModel.isLoading && viewModel.results.isEmpty {
             Spacer()
-            ProgressView()
-                .tint(.white)
+            CometSpinnerView()
                 .frame(maxWidth: .infinity)
             Spacer()
         } else {

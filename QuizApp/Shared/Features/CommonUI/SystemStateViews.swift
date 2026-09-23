@@ -5,9 +5,7 @@ struct SystemLoadingView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            ProgressView()
-                .controlSize(.large)
-                .tint(.white)
+            CometSpinnerView()
             Text(message)
                 .font(.system(size: 15, weight: .medium, design: .rounded))
                 .foregroundStyle(QuizTheme.mutedText)

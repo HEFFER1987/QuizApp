@@ -11,8 +11,7 @@ struct ProfileView<ViewModel: ProfileViewModel>: View {
     var body: some View {
         Group {
             if viewModel.isLoading && viewModel.profile == nil {
-                ProgressView()
-                    .tint(.white)
+                CometSpinnerView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let profile = viewModel.profile {
                 ScrollView {

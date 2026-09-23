@@ -34,11 +34,7 @@ struct LaunchView: View {
         ZStack {
             CommonBackgroundView()
 
-            ProgressView()
-                .progressViewStyle(.circular)
-                .tint(.white)
-                .controlSize(.large)
-                .scaleEffect(1.6)
+            CometSpinnerView(size: 96)
 
             Color.clear
                 .contentShape(Rectangle())
@@ -59,11 +55,7 @@ struct LaunchView: View {
 
     private var splashContent: some View {
         ZStack {
-            ProgressView()
-                .progressViewStyle(.circular)
-                .tint(.white)
-                .controlSize(.large)
-                .scaleEffect(1.6)
+            CometSpinnerView(size: 96)
 
             Color.clear
                 .contentShape(Rectangle())

@@ -69,8 +69,7 @@ struct ResultDetailView<ViewModel: ResultDetailViewModel>: View {
     private var content: some View {
         if viewModel.isLoading && viewModel.detail == nil {
             Spacer()
-            ProgressView()
-                .tint(.white)
+            CometSpinnerView()
             Spacer()
         } else if let detail = viewModel.detail {
             VStack(spacing: 0) {
