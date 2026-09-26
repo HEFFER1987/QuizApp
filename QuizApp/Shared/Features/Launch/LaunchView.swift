@@ -34,7 +34,8 @@ struct LaunchView: View {
         ZStack {
             CommonBackgroundView()
 
-            CometSpinnerView(size: 96)
+            CometSpinnerView()
+                .frame(width: 134, height: 134)
 
             Color.clear
                 .contentShape(Rectangle())
@@ -55,7 +56,8 @@ struct LaunchView: View {
 
     private var splashContent: some View {
         ZStack {
-            CometSpinnerView(size: 96)
+            CometSpinnerView()
+                .frame(width: 134, height: 134)
 
             Color.clear
                 .contentShape(Rectangle())

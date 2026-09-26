@@ -61,7 +61,6 @@ struct QuizListView<ViewModel: QuizListViewModel>: View {
         if viewModel.isLoading && viewModel.quizzes.isEmpty {
             Spacer()
             CometSpinnerView()
-                .frame(maxWidth: .infinity)
             Spacer()
         } else {
             ScrollView {

@@ -52,7 +52,6 @@ struct ResultsView<ViewModel: ResultsViewModel>: View {
         if viewModel.isLoading && viewModel.results.isEmpty {
             Spacer()
             CometSpinnerView()
-                .frame(maxWidth: .infinity)
             Spacer()
         } else {
             ScrollView {
