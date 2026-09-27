@@ -36,7 +36,7 @@ class MainTabCoordinatorImpl: Coordinator<MainTabRoute>, MainTabCoordinator {
     }
 
     func showResultDetail(_ result: QuizResult) async {
-        let coordinator = ResultDetailCoordinatorImpl(resultId: result.id)
+        let coordinator = ResultDetailCoordinatorImpl(resultId: result.id, mainTabCoordinator: self)
         await navigate(to: coordinator, presentationStyle: .push)
     }
 

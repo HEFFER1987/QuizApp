@@ -8,6 +8,7 @@ struct QuizPlayQuestion: Identifiable, Equatable {
     let correctOptionIDs: Set<String>
     let categoryLabel: String?
     let codeSnippet: String?
+    let explanation: String
 
     init(
         id: String,
@@ -16,7 +17,8 @@ struct QuizPlayQuestion: Identifiable, Equatable {
         type: QuizBuilderQuestionType,
         correctOptionIDs: Set<String>,
         categoryLabel: String? = nil,
-        codeSnippet: String? = nil
+        codeSnippet: String? = nil,
+        explanation: String = ""
     ) {
         self.id = id
         self.prompt = prompt
@@ -25,6 +27,7 @@ struct QuizPlayQuestion: Identifiable, Equatable {
         self.correctOptionIDs = correctOptionIDs
         self.categoryLabel = categoryLabel
         self.codeSnippet = codeSnippet
+        self.explanation = explanation
     }
 }
 
@@ -73,16 +76,17 @@ struct QuizPlayRepositoryMock: QuizPlayRepository {
     private static let sampleQuestions: [QuizPlayQuestion] = [
         QuizPlayQuestion(
             id: "1",
-            prompt: "What is Swift?",
+            prompt: "What is the result of the following code?",
             options: [
-                QuizPlayOption(id: "1a", text: "A programming language"),
-                QuizPlayOption(id: "1b", text: "A bird species"),
-                QuizPlayOption(id: "1c", text: "A database"),
-                QuizPlayOption(id: "1d", text: "An IDE")
+                QuizPlayOption(id: "a", text: "[1, 2, 3]"),
+                QuizPlayOption(id: "b", text: "[2, 4, 6]"),
+                QuizPlayOption(id: "c", text: "[1, 4, 9]"),
+                QuizPlayOption(id: "d", text: "[3, 6, 9]")
             ],
             type: .singleChoice,
             correctOptionIDs: ["1a"],
-            categoryLabel: "Swift Basics"
+            categoryLabel: "Swift Basics",
+            explanation: "Правильный ответ: B\n[1, 2, 3] * 2 = [2, 4, 6]"
         ),
         QuizPlayQuestion(
             id: "2",
@@ -135,7 +139,8 @@ struct QuizPlayRepositoryMock: QuizPlayRepository {
             ],
             type: .multipleChoice,
             correctOptionIDs: ["5a", "5c"],
-            categoryLabel: "Types"
+            categoryLabel: "Types",
+            explanation: "struct и enum — value types; class и actor — reference types."
         ),
         QuizPlayQuestion(
             id: "6",

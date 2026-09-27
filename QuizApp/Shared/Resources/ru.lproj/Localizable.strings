@@ -90,3 +90,22 @@
 "profile.empty.history" = "Пока нет пройденных квизов";
 "profile.empty.quizzes" = "Нет квизов в этом фильтре";
 
+"quizPlay.submit" = "Ответить";
+"quizPlay.next" = "Далее";
+"quizPlay.loading" = "Загрузка квиза...";
+"quizPlay.error.title" = "Что-то пошло не так";
+"quizPlay.error.message" = "Не удалось загрузить квиз.";
+"quizPlay.error.retry" = "Повторить";
+"quizPlay.copyCode" = "Копировать код";
+"quizPlay.hints.title" = "ПОДСКАЗКИ";
+"quizPlay.hints.countLabel" = "Подсказки";
+"quizPlay.hints.fiftyFifty" = "50/50";
+"quizPlay.hints.audience" = "Помощь зала";
+"quizPlay.hints.extraTime" = "Доп. время";
+"quizPlay.complete.title" = "КВИЗ ЗАВЕРШЁН";
+"quizPlay.complete.greatJob" = "Отличная работа!";
+"quizPlay.complete.review" = "Разбор ответов";
+"quizPlay.complete.retry" = "Пройти снова";
+"quizPlay.complete.share" = "Поделиться";
+"quizPlay.complete.levelUp" = "Новый уровень → %d";
+

@@ -9,6 +9,13 @@ enum QuizPlayError: Error {
     case loadFailed
 }
 
+enum QuizPlayOptionVisualState: Equatable {
+    case normal
+    case selected
+    case correct
+    case incorrect
+}
+
 @MainActor
 protocol QuizPlayViewModel: ObservableObject {
     var quizTitle: String { get }
@@ -21,6 +28,9 @@ protocol QuizPlayViewModel: ObservableObject {
     var isComplete: Bool { get }
     var sessionResult: QuizPlaySessionResult? { get }
     var error: QuizPlayError? { get set }
+    var isCurrentQuestionEvaluated: Bool { get }
+    var hintsRemaining: Int { get }
+    var submitButtonTitle: String { get }
 
     var currentQuestion: QuizPlayQuestion? { get }
     var progressText: String { get }
@@ -41,6 +51,8 @@ protocol QuizPlayViewModel: ObservableObject {
     func retry()
     func reviewAnswers()
     func dismiss()
+    func optionState(for optionID: String) -> QuizPlayOptionVisualState
+    func shouldShowExplanation(for optionID: String) -> Bool
 }
 
 @MainActor
@@ -55,10 +67,12 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
     @Published private(set) var currentIndex: Int = 0
     @Published private(set) var selectedOptionIDs: Set<String> = []
     @Published private(set) var elapsedSeconds: Int = 0
-    @Published private(set) var isLoading: Bool = true
+    @Published private(set) var isLoading: Bool = false
     @Published private(set) var isComplete: Bool = false
     @Published private(set) var sessionResult: QuizPlaySessionResult?
     @Published var error: QuizPlayError?
+    @Published private(set) var isCurrentQuestionEvaluated: Bool = false
+    @Published private(set) var hintsRemaining: Int = 3
 
     private var answers: [String: Set<String>] = [:]
     private var timerTask: Task<Void, Never>?
@@ -73,11 +87,15 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
         return "\(currentIndex + 1) / \(questions.count)"
     }
 
-    var canGoBack: Bool { currentIndex > 0 && !isComplete }
-    var canConfirm: Bool { !selectedOptionIDs.isEmpty && !isComplete }
-    var isOnLastQuestion: Bool {
-        guard !questions.isEmpty else { return false }
-        return currentIndex >= questions.count - 1
+    var canGoBack: Bool { currentIndex > 0 && !isComplete && !isCurrentQuestionEvaluated }
+    var canConfirm: Bool {
+        guard !isComplete else { return false }
+        if isCurrentQuestionEvaluated { return true }
+        return !selectedOptionIDs.isEmpty
+    }
+
+    var submitButtonTitle: String {
+        isCurrentQuestionEvaluated ? Strings.QuizPlay.next : Strings.QuizPlay.submit
     }
 
     init(
@@ -97,6 +115,7 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
     func load() async {
         isLoading = true
         error = nil
+        isCurrentQuestionEvaluated = false
         defer { isLoading = false }
         do {
             let payload = try await repository.loadQuiz(id: quizID)
@@ -110,6 +129,7 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
     }
 
     func selectOption(_ optionID: String) {
+        guard !isCurrentQuestionEvaluated else { return }
         guard let question = currentQuestion else { return }
         switch question.type {
         case .singleChoice:
@@ -131,8 +151,15 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
 
     func goNext() {
         guard let question = currentQuestion else { return }
-        guard !selectedOptionIDs.isEmpty else { return }
+
+        if !isCurrentQuestionEvaluated {
+            isCurrentQuestionEvaluated = true
+            return
+        }
+
         answers[question.id] = selectedOptionIDs
+        isCurrentQuestionEvaluated = false
+
         if currentIndex >= questions.count - 1 {
             finishSession()
             return
@@ -143,6 +170,7 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
 
     func goBack() {
         guard canGoBack else { return }
+        isCurrentQuestionEvaluated = false
         persistCurrentAnswerIfNeeded()
         currentIndex -= 1
         selectedOptionIDs = answers[questions[currentIndex].id] ?? []
@@ -208,6 +236,7 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
         answers = [:]
         isComplete = false
         sessionResult = nil
+        isCurrentQuestionEvaluated = false
         elapsedSeconds = 0
         isLoading = false
         startTimer()
@@ -233,6 +262,35 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
         } else {
             answers[question.id] = selectedOptionIDs
         }
+    }
+
+    func optionState(for optionID: String) -> QuizPlayOptionVisualState {
+        guard let question = currentQuestion else { return .normal }
+
+        if isCurrentQuestionEvaluated {
+            if question.correctOptionIDs.contains(optionID) {
+                return .correct
+            }
+            if selectedOptionIDs.contains(optionID) {
+                return .incorrect
+            }
+            return .normal
+        }
+
+        if selectedOptionIDs.contains(optionID) {
+            return .selected
+        }
+        return .normal
+    }
+
+    func shouldShowExplanation(for optionID: String) -> Bool {
+        guard isCurrentQuestionEvaluated,
+                let question = currentQuestion,
+                selectedOptionIDs.contains(optionID),
+                !question.correctOptionIDs.contains(optionID),
+                !question.explanation.isEmpty
+        else { return false }
+        return true
     }
 
     private func startTimer() {

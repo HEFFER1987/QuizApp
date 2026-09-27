@@ -90,9 +90,11 @@ struct ProfileView<ViewModel: ProfileViewModel>: View {
         } else {
             LazyVStack(spacing: 12) {
                 ForEach(quizzes) { quiz in
-                    QuizCardView(quiz: quiz) {
-                        viewModel.openQuizMenu(quiz)
-                    }
+                    QuizCardView(
+                        quiz: quiz,
+                        onCardTap: { viewModel.openQuizMenu(quiz) },
+                        onMenuTap: { viewModel.openQuizMenu(quiz) }
+                    )
                 }
             }
         }

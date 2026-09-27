@@ -34,6 +34,25 @@
 "quizList.stats.attempts" = "%d attempts";
 "quizList.stats.updated" = "Updated %@";
 
+"quizPlay.submit" = "Submit";
+"quizPlay.next" = "Next";
+"quizPlay.loading" = "Loading quiz...";
+"quizPlay.error.title" = "Something went wrong";
+"quizPlay.error.message" = "Unable to load quiz.";
+"quizPlay.error.retry" = "Try Again";
+"quizPlay.copyCode" = "Copy code";
+"quizPlay.hints.title" = "HINTS";
+"quizPlay.hints.countLabel" = "Hints";
+"quizPlay.hints.fiftyFifty" = "50/50";
+"quizPlay.hints.audience" = "Ask the audience";
+"quizPlay.hints.extraTime" = "Extra time";
+"quizPlay.complete.title" = "QUIZ COMPLETE";
+"quizPlay.complete.greatJob" = "Great job!";
+"quizPlay.complete.review" = "Review Answers";
+"quizPlay.complete.retry" = "Retry";
+"quizPlay.complete.share" = "Share Result";
+"quizPlay.complete.levelUp" = "Level up → %d";
+
 "mainTab.quizzes" = "My QUIZes";
 "mainTab.explore" = "Explore";
 "mainTab.results" = "Results";
