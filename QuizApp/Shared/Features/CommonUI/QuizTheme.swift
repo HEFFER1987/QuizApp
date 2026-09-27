@@ -8,6 +8,8 @@ enum QuizTheme {
     static let mutedText = Color(asset: Asset.QuizTheme.mutedText)
     static let tabBarFill = Color(asset: Asset.QuizTheme.tabBarFill)
     static let activeTab = Color(asset: Asset.QuizTheme.activeTab)
+    static let excellentGlow = Color(asset: Asset.QuizTheme.excellentGlow)
+    static let reviewGlow = Color(asset: Asset.QuizTheme.reviewGlow)
 
     static func glowColor(for status: QuizStatus) -> Color {
         switch status {
@@ -16,5 +18,28 @@ enum QuizTheme {
         case .published:
             return publishedGlow
         }
+    }
+
+    static func glowColor(for iconGlow: ResultIconGlow) -> Color {
+        switch iconGlow {
+        case .blue:
+            return publishedGlow
+        case .orange:
+            return draftGlow
+        case .purple:
+            return reviewGlow
+        case .green:
+            return excellentGlow
+        }
+    }
+
+    static func scoreBadgeColor(for scorePercent: Int) -> Color {
+        if scorePercent >= 90 {
+            return excellentGlow
+        }
+        if scorePercent >= 80 {
+            return publishedGlow
+        }
+        return draftGlow
     }
 }

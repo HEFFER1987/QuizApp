@@ -3,10 +3,15 @@ import SwiftUI
 struct MainTabView: View {
 
     @StateObject private var quizListViewModel: QuizListViewModelImpl
+    @StateObject private var resultsViewModel: ResultsViewModelImpl
     @State private var selectedTab: MainTabItem = .quizzes
 
-    init(quizListViewModel: @autoclosure @escaping () -> QuizListViewModelImpl) {
+    init(
+        quizListViewModel: @autoclosure @escaping () -> QuizListViewModelImpl,
+        resultsViewModel: @autoclosure @escaping () -> ResultsViewModelImpl
+    ) {
         _quizListViewModel = StateObject(wrappedValue: quizListViewModel())
+        _resultsViewModel = StateObject(wrappedValue: resultsViewModel())
     }
 
     var body: some View {
@@ -22,9 +27,10 @@ struct MainTabView: View {
 
     @ViewBuilder
     private var backgroundView: some View {
-        if selectedTab == .quizzes {
+        switch selectedTab {
+        case .quizzes, .results:
             QuizListBackgroundView()
-        } else {
+        case .explore, .profile:
             CommonBackgroundView()
         }
     }
@@ -37,7 +43,7 @@ struct MainTabView: View {
         case .explore:
             PlaceholderTabView(title: Strings.Placeholder.Explore.title)
         case .results:
-            PlaceholderTabView(title: Strings.Placeholder.Results.title)
+            ResultsView(viewModel: resultsViewModel)
         case .profile:
             PlaceholderTabView(title: Strings.Placeholder.Profile.title)
         }
@@ -50,6 +56,9 @@ struct MainTabView: View {
         MainTabView(
             quizListViewModel: QuizListViewModelImpl(
                 coordinator: QuizListCoordinatorImpl()
+            ),
+            resultsViewModel: ResultsViewModelImpl(
+                coordinator: ResultsCoordinatorImpl()
             )
         )
     }
