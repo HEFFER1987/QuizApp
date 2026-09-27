@@ -1,7 +1,9 @@
 import SwiftUI
 import SUICoordinator
 
-protocol QuizBuilderCoordinator {}
+protocol QuizBuilderCoordinator {
+    func dismiss() async
+}
 
 class QuizBuilderCoordinatorImpl: Coordinator<DefaultRoute>, QuizBuilderCoordinator {
 
@@ -11,5 +13,9 @@ class QuizBuilderCoordinatorImpl: Coordinator<DefaultRoute>, QuizBuilderCoordina
             QuizBuilderView(viewModel: viewModel)
         })
         await startFlow(route: route)
+    }
+
+    func dismiss() async {
+        await finishFlow(animated: true)
     }
 }
