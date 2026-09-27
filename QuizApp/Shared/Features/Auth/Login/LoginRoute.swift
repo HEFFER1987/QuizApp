@@ -7,16 +7,24 @@ enum LoginRoute: RouteType {
     case signup(coordinator: SignUpCoordinator)
 
     var presentationStyle: TransitionPresentationStyle {
-        .custom(transition: .identity, animation: .default, fullScreen: true)
+        .platformRootFlow
     }
 
     @ViewBuilder
     var body: some View {
         switch self {
         case .main(let coordinator):
+            #if os(macOS)
+            MacLoginView(viewModel: LoginViewModelImpl(coordinator: coordinator))
+            #else
             LoginView(viewModel: LoginViewModelImpl(coordinator: coordinator))
+            #endif
         case .signup(let coordinator):
+            #if os(macOS)
+            MacSignUpView(viewModel: SignUpViewModelImpl(coordinator: coordinator))
+            #else
             SignUpView(viewModel: SignUpViewModelImpl(coordinator: coordinator))
+            #endif
         }
     }
 }

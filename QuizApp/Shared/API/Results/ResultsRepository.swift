@@ -21,7 +21,8 @@ struct ResultsRepositoryMock: ResultsRepository {
             averageScorePercent: 84,
             quizzesCompleted: 48,
             totalAttempts: 63,
-            streakDays: 12
+            streakDays: 12,
+            globalRank: 14
         )
     }
 
@@ -248,5 +249,21 @@ struct ResultsRepositoryMock: ResultsRepository {
             difficulty: difficulty,
             questions: questions
         )
+    }
+}
+
+struct ResultsRepositoryLive: ResultsRepository {
+    private let fallback = ResultsRepositoryMock()
+
+    func fetchResults() async throws -> [QuizResult] {
+        try await fallback.fetchResults()
+    }
+
+    func fetchSummary() async throws -> ResultsSummary {
+        try await fallback.fetchSummary()
+    }
+
+    func fetchResultDetail(id: String) async throws -> QuizResultDetail {
+        try await fallback.fetchResultDetail(id: id)
     }
 }

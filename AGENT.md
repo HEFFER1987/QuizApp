@@ -6,7 +6,7 @@ Concise rules for AI agents and contributors working on QuizApp. Keep this file 
 - Swift (latest), strict Swift Concurrency. SwiftUI over UIKit — only `import UIKit` when a task genuinely can't be done in SwiftUI (e.g. presenting a view controller for Sign in with Google/Apple).
 - MVVM: `View` <-> `ViewModel` <-> services, wired through protocols (DI).
 - Navigation uses the `SUICoordinator` package: each feature has a `<Name>Coordinator` protocol + `<Name>CoordinatorImpl : Coordinator<Route>` that builds its `View`/`ViewModel` and drives flow (see `SignUpCoordinator`). Don't introduce raw `NavigationStack`/`NavigationPath` navigation in coordinator-owned flows.
-- Folder layout: `Shared/Features/<Feature>/{<Name>View, <Name>ViewModel, <Name>Coordinator, <Name>Route}.swift`.
+- Folder layout: cross-platform logic in `Shared/Features/<Feature>/` (`<Name>ViewModel`, coordinator protocols, repositories, shared UI). Platform-specific screens live in `QuizApp/iOS/Features/...` and `QuizApp/macOS/Features/...` (e.g. `LoginView` vs `MacLoginView`).
 - No dead code: no unused imports, variables, functions, or types. Anything not used outside its file must be `private`/`fileprivate`. Code should stay clean under Periphery-style analysis.
 
 ## 2. Naming

@@ -74,7 +74,8 @@ final class ResultsPreviewViewModel: ResultsViewModel {
         averageScorePercent: 84,
         quizzesCompleted: 48,
         totalAttempts: 63,
-        streakDays: 12
+        streakDays: 12,
+        globalRank: 14
     )
     var filteredResults: [QuizResult] {
         results.filter { $0.matches(filter) }

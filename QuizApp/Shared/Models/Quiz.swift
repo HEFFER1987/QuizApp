@@ -15,6 +15,9 @@ struct Quiz: Identifiable, Equatable {
     let id: String
     let title: String
     let subtitle: String?
+    let categoryLabel: String?
+    let tags: [String]
+    let difficulty: String?
     let questionCount: Int
     let status: QuizStatus
     let iconName: String
@@ -38,6 +41,23 @@ extension Quiz {
         let lowercasedQuery = trimmed.lowercased()
         if title.lowercased().contains(lowercasedQuery) { return true }
         if let subtitle, subtitle.lowercased().contains(lowercasedQuery) { return true }
+        if let categoryLabel, categoryLabel.lowercased().contains(lowercasedQuery) { return true }
+        if tags.contains(where: { $0.lowercased().contains(lowercasedQuery) }) { return true }
         return false
+    }
+
+    var inlineStatsText: String {
+        var parts = [Strings.QuizList.Stats.questions(questionCount)]
+        if let attemptCount {
+            parts.append(Strings.QuizList.Stats.attempts(attemptCount))
+        }
+        if let averageScorePercent {
+            parts.append("\(averageScorePercent)% avg. score")
+        } else if let updatedAt {
+            let formatter = RelativeDateTimeFormatter()
+            formatter.unitsStyle = .full
+            parts.append(Strings.QuizList.Stats.updated(formatter.localizedString(for: updatedAt, relativeTo: Date())))
+        }
+        return parts.joined(separator: " · ")
     }
 }

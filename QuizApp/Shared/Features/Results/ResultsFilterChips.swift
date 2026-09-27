@@ -47,6 +47,8 @@ struct ResultsFilterChips: View {
             return Strings.ResultsHistory.Filter.excellent
         case .needsReview:
             return Strings.ResultsHistory.Filter.needsReview
+        case .createdByMe:
+            return "Created by me"
         case .composite:
             return Strings.ResultsHistory.Filter.composite
         }
@@ -60,6 +62,8 @@ struct ResultsFilterChips: View {
             return QuizTheme.excellentGlow
         case .needsReview:
             return QuizTheme.reviewGlow
+        case .createdByMe:
+            return QuizTheme.activeTab
         case .composite:
             return QuizTheme.publishedGlow
         }

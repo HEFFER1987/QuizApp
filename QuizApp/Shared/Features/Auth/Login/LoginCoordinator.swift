@@ -13,12 +13,30 @@ class LoginCoordinatorImpl: Coordinator<LoginRoute>, LoginCoordinator {
     }
 
     func showSignUp() async {
+        #if os(macOS)
+        if let launchCoordinator = parent as? LaunchCoordinatorImpl {
+            await launchCoordinator.showSignUp(from: self)
+            return
+        }
+        #endif
         let coordinator = SignUpCoordinatorImpl()
         await navigate(to: coordinator, presentationStyle: .push)
     }
 
     func showMainApp() async {
+        #if os(macOS)
+        if let launchCoordinator = parent as? LaunchCoordinatorImpl {
+            await launchCoordinator.showMainApp()
+            return
+        }
+        let coordinator = MacRootCoordinatorImpl()
+        await coordinator.start()
+        await MainActor.run {
+            MacLaunchUIState.shared.presentMain(with: coordinator)
+        }
+        #else
         let coordinator = MainTabCoordinatorImpl()
-        await navigate(to: coordinator, presentationStyle: .fullScreenCover)
+        await navigate(to: coordinator, presentationStyle: .platformModalFlow)
+        #endif
     }
 }

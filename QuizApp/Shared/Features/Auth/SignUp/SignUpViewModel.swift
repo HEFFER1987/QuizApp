@@ -1,11 +1,13 @@
 import Foundation
 import AuthenticationServices
+import FirebaseAuth
 
 enum SignUpError: Error {
     case emailEmpty
     case passwordEmpty
     case confirmPasswordEmpty
     case passwordMismatch
+    case emailAlreadyInUse
     case appleIDCredentialEmpty
     case authentificationService(error: Error)
     case rawNonceEmpty
@@ -17,6 +19,8 @@ protocol SignUpViewModel: ObservableObject {
     var email: String { get set }
     var password: String { get set }
     var confirmPassword: String { get set }
+    var isLoading: Bool { get }
+    var error: SignUpError? { get }
 
     func signUp()
     func login()
@@ -34,15 +38,12 @@ final class SignUpViewModelImpl: AuthViewModelBase, SignUpViewModel {
     init(
         coordinator: SignUpCoordinator,
         authManager: AuthManager = AuthManagerImp(),
-        googleSignInProvider: GoogleSignInProviding = GoogleSignInProvider(),
-        presentingViewControllerProvider: PresentingViewControllerProviding =
-            UIApplicationTopViewControllerProvider()
+        googleSignInProvider: GoogleSignInProviding = GoogleSignInProvider()
     ) {
         self.coordinator = coordinator
         super.init(
             authManager: authManager,
-            googleSignInProvider: googleSignInProvider,
-            presentingViewControllerProvider: presentingViewControllerProvider
+            googleSignInProvider: googleSignInProvider
         )
     }
 
@@ -67,15 +68,23 @@ final class SignUpViewModelImpl: AuthViewModelBase, SignUpViewModel {
             self.error = .confirmPasswordEmpty
             return
         }
-        self.isLoading = true
-        defer {
-            self.isLoading = false
-        }
 
-        Task {
+        Task { @MainActor in
+            guard !isLoading else { return }
+            isLoading = true
+            error = nil
+            defer { isLoading = false }
+
             do {
                 let userId = try await authManager.signUp(method: .email(email: email, password: password))
                 await handleAuthSuccess(userId: userId, provider: .email)
+            } catch let signUpError as NSError where signUpError.code == AuthErrorCode.emailAlreadyInUse.rawValue {
+                do {
+                    let userId = try await authManager.signIn(method: .email(email: email, password: password))
+                    await handleAuthSuccess(userId: userId, provider: .email)
+                } catch {
+                    self.error = .emailAlreadyInUse
+                }
             } catch {
                 Logger.shared.log("Firebase register failed: \(error)", level: .error)
                 self.error = .firebase(error: error)
@@ -165,12 +174,42 @@ final class SignUpViewModelImpl: AuthViewModelBase, SignUpViewModel {
     }
 }
 
+extension SignUpError {
+    var userMessage: String {
+        switch self {
+        case .emailEmpty:
+            return "Enter your email address."
+        case .passwordEmpty:
+            return "Enter and confirm your password."
+        case .confirmPasswordEmpty:
+            return "Confirm your password."
+        case .passwordMismatch:
+            return "Passwords do not match."
+        case .emailAlreadyInUse:
+            return "This email is already registered. Use Login or try a different password."
+        case .appleIDCredentialEmpty, .rawNonceEmpty, .idTokenEmpty:
+            return "Apple sign up failed. Please try again."
+        case .authentificationService(let error):
+            return error.localizedDescription
+        case .firebase(let error):
+            let nsError = error as NSError
+            if nsError.code == 17995 {
+                return "Keychain access failed. Rebuild the app with code signing enabled."
+            }
+            if nsError.code == 17004 {
+                return "Invalid email or password."
+            }
+            return error.localizedDescription
+        }
+    }
+}
+
 private extension GoogleSignInError {
     var toSignUpError: SignUpError {
         switch self {
         case .configurationMissing:
             return .authentificationService(error: self)
-        case .noPresentingViewController:
+        case .noPresentingContext:
             return .authentificationService(error: self)
         case .idTokenEmpty:
             return .idTokenEmpty

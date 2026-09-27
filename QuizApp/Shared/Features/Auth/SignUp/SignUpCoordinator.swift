@@ -9,6 +9,7 @@ protocol SignUpCoordinator {
 class SignUpCoordinatorImpl: Coordinator<DefaultRoute>, SignUpCoordinator {
 
     override func start() async {
+        #if os(iOS)
         let viewModel = SignUpViewModelImpl(coordinator: self)
 
         let route = DefaultRoute(presentationStyle: .push, content: {
@@ -16,9 +17,14 @@ class SignUpCoordinatorImpl: Coordinator<DefaultRoute>, SignUpCoordinator {
         })
 
         await startFlow(route: route)
+        #endif
     }
 
     func moveBackToLogin() async {
+        #if os(macOS)
+        MacLaunchUIState.shared.backToLogin()
+        return
+        #endif
         await finishFlow(animated: true)
     }
 
@@ -30,9 +36,17 @@ class SignUpCoordinatorImpl: Coordinator<DefaultRoute>, SignUpCoordinator {
             return
         }
 
+        #if os(macOS)
+        let coordinator = MacRootCoordinatorImpl()
+        await coordinator.start()
+        await MainActor.run {
+            MacLaunchUIState.shared.presentMain(with: coordinator)
+        }
+        #else
         await navigate(
             to: MainTabCoordinatorImpl(),
-            presentationStyle: .fullScreenCover
+            presentationStyle: .platformModalFlow
         )
+        #endif
     }
 }

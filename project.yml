@@ -182,11 +182,12 @@ targets:
           - name: "Run Firebase plist file script"
             script: |
               echo "Running a Firebase plist script"
-              PLIST_DEST="${TARGET_BUILD_DIR}/${WRAPPER_NAME}/GoogleService-Info.plist"
+              PLIST_DEST="${TARGET_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/GoogleService-Info.plist"
+              rm -f "${TARGET_BUILD_DIR}/${WRAPPER_NAME}/GoogleService-Info.plist"
               if [ "${CONFIGURATION}" == "Release" ]; then
-                SOURCE="${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Prod.plist"
+                SOURCE="${PROJECT_DIR}/FirebaseConfigs/macOS/GoogleService-Info-Prod.plist"
               else
-                SOURCE="${PROJECT_DIR}/FirebaseConfigs/GoogleService-Info-Dev.plist"
+                SOURCE="${PROJECT_DIR}/FirebaseConfigs/macOS/GoogleService-Info-Dev.plist"
               fi
               if [ ! -f "${SOURCE}" ]; then
                 echo "error: Firebase config not found at ${SOURCE}"
@@ -230,11 +231,14 @@ targets:
                 GCC_C_LANGUAGE_STANDARD: gnu17
                 CURRENT_PROJECT_VERSION: 1.0
                 MARKETING_VERSION: 1.0
-                
+                CODE_SIGN_ENTITLEMENTS: QuizApp/macOS/QuizApp-macOS.entitlements
+                PRODUCT_BUNDLE_IDENTIFIER: my.QuizApp-macOS
+                CODE_SIGN_STYLE: Automatic
+                DEVELOPMENT_TEAM: WG85DUNFDU
     QuizAppTests:
         type: bundle.unit-test
         platform: iOS
-        deploymentTarget: "16.0"
+        deploymentTarget: "26.0"
         sources: [QuizAppTests]
         dependencies:
             - target: QuizApp-iOS
@@ -268,4 +272,12 @@ schemes:
             targets:
                 - QuizAppTests
                 - QuizAppUITests
+    QuizApp-macOS:
+        build:
+            targets:
+                QuizApp-macOS: all
+        run:
+            config: Debug
+            commandLineArguments:
+                "-resetLogin": false
 

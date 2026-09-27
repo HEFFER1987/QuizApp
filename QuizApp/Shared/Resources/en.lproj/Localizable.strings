@@ -1,15 +1,23 @@
 "login.welcome.title" = "Welcome Back!";
+"login.welcome.subtitle" = "Log in to your account and continue your journey of knowledge";
+"login.continueWith" = "Or continue with";
 "login.action.login" = "Login";
 "login.google.button" = "Sign in with Google";
+"login.apple.button" = "Sign in with Apple";
 "login.password.hide" = "Hide password";
 "login.password.show" = "Show password";
 
 "logs.title" = "Logs";
 
-"signup.create.title" = "Create account";
+"signup.create.title" = "Create Account";
+"signup.create.subtitle" = "Join QUIZ and start creating, taking and sharing amazing quizzes!";
 "signup.confirm.password.placeholder" = "Confirm password";
+"signup.continueWith" = "Or";
 "signup.action.back" = "Already have an account? Log in";
+"signup.action.alreadyHaveAccount" = "Already have an account?";
+"signup.action.login" = "Log in";
 "signup.google.button" = "Sign up with Google";
+"signup.apple.button" = "Sign up with Apple";
 
 "common.email.placeholder" = "Email";
 "common.password.placeholder" = "Password";

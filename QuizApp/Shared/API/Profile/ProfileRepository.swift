@@ -82,6 +82,9 @@ struct ProfileRepositoryMock: ProfileRepository {
                 id: "fav-1",
                 title: "Swift Basics",
                 subtitle: nil,
+                categoryLabel: "Programming • Swift",
+                tags: ["Swift"],
+                difficulty: "Medium",
                 questionCount: 12,
                 status: .published,
                 iconName: "chevron.left.forwardslash.chevron.right",
@@ -93,6 +96,9 @@ struct ProfileRepositoryMock: ProfileRepository {
                 id: "fav-2",
                 title: "World History",
                 subtitle: nil,
+                categoryLabel: "History",
+                tags: ["History"],
+                difficulty: "Hard",
                 questionCount: 20,
                 status: .published,
                 iconName: "globe.americas.fill",
@@ -102,4 +108,12 @@ struct ProfileRepositoryMock: ProfileRepository {
             )
         ]
     )
+}
+
+struct ProfileRepositoryLive: ProfileRepository {
+    private let fallback = ProfileRepositoryMock()
+
+    func fetchProfile() async throws -> UserProfile {
+        try await fallback.fetchProfile()
+    }
 }

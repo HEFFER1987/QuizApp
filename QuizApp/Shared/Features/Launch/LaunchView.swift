@@ -1,23 +1,41 @@
 import SwiftUI
 
-struct LaunchView<ViewModel: LaunchViewModel>: View {
+struct LaunchView: View {
 
-    @StateObject private var viewModel: ViewModel
+    @StateObject private var viewModel: LaunchViewModelImpl
+    @ObservedObject private var appState = AppStateManager.shared
 
-    init(viewModel: @autoclosure @escaping () -> ViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel())
+    init(coordinator: LaunchCoordinator) {
+        _viewModel = StateObject(wrappedValue: LaunchViewModelImpl(coordinator: coordinator))
     }
 
     var body: some View {
-        ZStack {
+        #if os(macOS)
+        macBody
+        #else
+        iosBody
+        #endif
+    }
 
+    #if os(macOS)
+    private var macBody: some View {
+        Group {
+            if viewModel.macLaunchContent == .splash {
+                splashContent
+            } else {
+                Color.clear
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    #endif
+
+    private var iosBody: some View {
+        ZStack {
             CommonBackgroundView()
 
-            ProgressView()
-                .progressViewStyle(.circular)
-                .tint(.white)
-                .controlSize(.large)
-                .scaleEffect(1.6)
+            CometSpinnerView()
+                .frame(width: 134, height: 134)
 
             Color.clear
                 .contentShape(Rectangle())
@@ -27,16 +45,38 @@ struct LaunchView<ViewModel: LaunchViewModel>: View {
                         await viewModel.trippleTap()
                     }
                 }
-             .onAppear(perform: {
-                 Task {
-                     await viewModel.startTimer()
-                 }
-              })
+                .onAppear {
+                    Task {
+                        await viewModel.startTimer()
+                    }
+                }
+        }
+        .ignoresSafeArea()
+    }
+
+    private var splashContent: some View {
+        ZStack {
+            CometSpinnerView()
+                .frame(width: 134, height: 134)
+
+            Color.clear
+                .contentShape(Rectangle())
+                .ignoresSafeArea()
+                .onTapGesture(count: 3) {
+                    Task {
+                        await viewModel.trippleTap()
+                    }
+                }
+                .onAppear {
+                    Task {
+                        await viewModel.startTimer()
+                    }
+                }
         }
         .ignoresSafeArea()
     }
 }
 
 #Preview {
-    LaunchView(viewModel: LaunchViewModelImpl(coordinator: LaunchCoordinatorImpl()))
+    LaunchView(coordinator: LaunchCoordinatorImpl())
 }

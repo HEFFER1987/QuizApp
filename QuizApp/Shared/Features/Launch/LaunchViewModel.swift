@@ -1,34 +1,61 @@
 import Foundation
 
+#if os(macOS)
+enum MacLaunchContent: Equatable {
+    case splash
+    case hidden
+}
+#endif
+
 protocol LaunchViewModel: ObservableObject {
     func trippleTap() async
     func startTimer() async
+    #if os(macOS)
+    @MainActor var macLaunchContent: MacLaunchContent { get }
+    @MainActor func hideLaunchContent()
+    #endif
 }
 
-class LaunchViewModelImpl: LaunchViewModel {
+@MainActor
+final class LaunchViewModelImpl: LaunchViewModel {
 
     let coordinator: LaunchCoordinator
 
-    init (coordinator: LaunchCoordinator) {
+    #if os(macOS)
+    @Published private(set) var macLaunchContent: MacLaunchContent = .splash
+
+    func hideLaunchContent() {
+        macLaunchContent = .hidden
+    }
+    #endif
+
+    init(coordinator: LaunchCoordinator) {
         self.coordinator = coordinator
     }
 
-    @MainActor func startTimer() async {
-        Task {
-            do {
-                try await Task.sleep(for: .seconds(3))
-                if AppStateManager.shared.authorizationState.isAuthorized {
-                    await coordinator.showMainApp()
-                } else {
-                    await coordinator.showLogin()
-                }
-            } catch {
-                print("Error starting timer: \(error)")
+    func startTimer() async {
+        do {
+            try await Task.sleep(for: .seconds(3))
+            if AppStateManager.shared.authorizationState.isAuthorized {
+                await coordinator.showMainApp()
+                #if os(macOS)
+                hideLaunchContent()
+                #endif
+            } else {
+                #if os(macOS)
+                let login = await coordinator.makeLoginCoordinator()
+                MacLaunchUIState.shared.presentLogin(with: login)
+                macLaunchContent = .hidden
+                #else
+                await coordinator.showLogin()
+                #endif
             }
+        } catch {
+            print("Error starting timer: \(error)")
         }
     }
 
-    @MainActor func trippleTap() async {
+    func trippleTap() async {
         await coordinator.showLogs()
     }
 }

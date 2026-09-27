@@ -244,6 +244,8 @@ struct QuizBuilderQuestionEditorOptionsSection: View {
             return isCorrect ? "circle.inset.filled" : "circle"
         case .multipleChoice:
             return isCorrect ? "checkmark.square.fill" : "square"
+        case .textAnswer:
+            return "textformat"
         }
     }
 }
