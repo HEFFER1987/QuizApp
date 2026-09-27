@@ -6,7 +6,6 @@ enum QuizTheme {
     static let searchGlow = Color(asset: Asset.QuizTheme.searchGlow)
     static let cardFill = Color(asset: Asset.QuizTheme.cardFill)
     static let mutedText = Color(asset: Asset.QuizTheme.mutedText)
-    static let tabBarFill = Color(asset: Asset.QuizTheme.tabBarFill)
     static let activeTab = Color(asset: Asset.QuizTheme.activeTab)
     static let excellentGlow = Color(asset: Asset.QuizTheme.excellentGlow)
     static let reviewGlow = Color(asset: Asset.QuizTheme.reviewGlow)

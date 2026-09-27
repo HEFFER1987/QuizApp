@@ -112,7 +112,13 @@ struct QuizBuilderPreviewView<ViewModel: QuizBuilderViewModel>: View {
     ZStack {
         QuizListBackgroundView()
         QuizBuilderPreviewView(
-            viewModel: QuizBuilderViewModelImpl(coordinator: QuizBuilderCoordinatorImpl())
+            viewModel: QuizBuilderViewModelImpl(coordinator: {
+                #if os(macOS)
+                MacQuizBuilderCoordinatorImpl()
+                #else
+                QuizBuilderCoordinatorImpl()
+                #endif
+            }())
         )
     }
 }

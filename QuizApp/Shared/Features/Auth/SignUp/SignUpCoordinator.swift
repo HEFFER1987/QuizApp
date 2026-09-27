@@ -9,6 +9,7 @@ protocol SignUpCoordinator {
 class SignUpCoordinatorImpl: Coordinator<DefaultRoute>, SignUpCoordinator {
 
     override func start() async {
+        #if os(iOS)
         let viewModel = SignUpViewModelImpl(coordinator: self)
 
         let route = DefaultRoute(presentationStyle: .push, content: {
@@ -16,6 +17,7 @@ class SignUpCoordinatorImpl: Coordinator<DefaultRoute>, SignUpCoordinator {
         })
 
         await startFlow(route: route)
+        #endif
     }
 
     func moveBackToLogin() async {

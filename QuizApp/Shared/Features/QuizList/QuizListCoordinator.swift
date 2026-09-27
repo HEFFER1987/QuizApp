@@ -1,5 +1,4 @@
-import SwiftUI
-import SUICoordinator
+import Foundation
 
 protocol QuizListCoordinator {
     func showQuizBuilder() async
@@ -8,17 +7,4 @@ protocol QuizListCoordinator {
 
 extension QuizListCoordinator {
     func playQuiz(_ quiz: Quiz) async {}
-}
-
-class QuizListCoordinatorImpl: QuizListCoordinator {
-
-    private weak var mainTabCoordinator: MainTabCoordinatorImpl?
-
-    init(mainTabCoordinator: MainTabCoordinatorImpl? = nil) {
-        self.mainTabCoordinator = mainTabCoordinator
-    }
-
-    func showQuizBuilder() async {
-        await mainTabCoordinator?.showQuizBuilder()
-    }
 }

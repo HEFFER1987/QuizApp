@@ -1,21 +1,5 @@
-import SwiftUI
-import SUICoordinator
+import Foundation
 
 protocol QuizBuilderCoordinator {
     func dismiss() async
-}
-
-class QuizBuilderCoordinatorImpl: Coordinator<DefaultRoute>, QuizBuilderCoordinator {
-
-    override func start() async {
-        let viewModel = QuizBuilderViewModelImpl(coordinator: self)
-        let route = DefaultRoute(presentationStyle: .push, content: {
-            QuizBuilderView(viewModel: viewModel)
-        })
-        await startFlow(route: route)
-    }
-
-    func dismiss() async {
-        await finishFlow(animated: true)
-    }
 }

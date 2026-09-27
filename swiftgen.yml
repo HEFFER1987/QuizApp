@@ -73,4 +73,5 @@ xcassets:
     - templateName: swift5
       params:
         forceProvidesNamespaces: true
+        enumName: Asset
       output: QuizApp/Swiftgen+Generated/Assets.swift

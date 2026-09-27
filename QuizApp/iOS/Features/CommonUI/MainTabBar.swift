@@ -46,7 +46,7 @@ struct MainTabBar: View {
         .padding(.top, 10)
         .padding(.bottom, 8)
         .background(
-            QuizTheme.tabBarFill
+            Color("tabBarFill")
                 .ignoresSafeArea(edges: .bottom)
         )
         .overlay(alignment: .top) {
