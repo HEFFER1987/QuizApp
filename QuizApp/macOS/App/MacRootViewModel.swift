@@ -10,6 +10,7 @@ protocol MacRootCoordinator: AnyObject {
     func showAchievements() async
     func showSettings() async
     func dismissEditor() async
+    func dismissQuizPlay() async
 }
 
 @MainActor
@@ -23,6 +24,7 @@ final class MacRootViewModel: ObservableObject {
     @Published var showQuizDetailsPanel: Bool = false
     @Published var showPublishPanel: Bool = false
     @Published var showPreviewWindow: Bool = false
+    @Published private(set) var quizPlayViewModel: QuizPlayViewModelImpl?
 
     let quizListViewModel: QuizListViewModelImpl
     let resultsViewModel: ResultsViewModelImpl
@@ -60,8 +62,30 @@ final class MacRootViewModel: ObservableObject {
     }
 
     func selectSidebar(_ item: MacSidebarItem) {
+        guard item != selectedSidebarItem else { return }
+        quizPlayViewModel = nil
         selectedSidebarItem = item
         contentDestination = .sidebar(item)
+        inspectorMode = .profile
+    }
+
+    func openQuizPlay(quizID: String) {
+        let playViewModel = QuizPlayViewModelImpl(
+            quizID: quizID,
+            coordinator: MacQuizPlayCoordinatorImpl(macRootCoordinator: coordinator),
+            repository: AppDependencies.makeQuizPlayRepository()
+        )
+        quizPlayViewModel = playViewModel
+        contentDestination = .quizPlay(quizID)
+        inspectorMode = .profile
+        Task {
+            await playViewModel.load()
+        }
+    }
+
+    func closeQuizPlay() {
+        quizPlayViewModel = nil
+        contentDestination = .sidebar(selectedSidebarItem)
         inspectorMode = .profile
     }
 
@@ -69,14 +93,6 @@ final class MacRootViewModel: ObservableObject {
         Task {
             await coordinator?.showSettings()
         }
-    }
-
-    func makeQuizPlayViewModel(quizID: String) -> QuizPlayViewModelImpl {
-        QuizPlayViewModelImpl(
-            quizID: quizID,
-            coordinator: MacQuizPlayCoordinatorImpl(macRootCoordinator: coordinator),
-            repository: AppDependencies.makeQuizPlayRepository()
-        )
     }
 
     func makeResultDetailViewModel(resultID: String) -> ResultDetailViewModelImpl {

@@ -11,4 +11,8 @@ final class QuizListCoordinatorImpl: QuizListCoordinator {
     func showQuizBuilder() async {
         await mainTabCoordinator?.showQuizBuilder()
     }
+
+    func playQuiz(_ quiz: Quiz) async {
+        await mainTabCoordinator?.showQuizPlay(quizID: quiz.id)
+    }
 }

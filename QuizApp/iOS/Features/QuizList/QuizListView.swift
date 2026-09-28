@@ -66,9 +66,19 @@ struct QuizListView<ViewModel: QuizListViewModel>: View {
             ScrollView {
                 LazyVStack(spacing: 14) {
                     ForEach(viewModel.filteredQuizzes) { quiz in
-                        QuizCardView(quiz: quiz) {
-                            viewModel.openQuizMenu(quiz: quiz)
-                        }
+                        QuizCardView(
+                            quiz: quiz,
+                            onCardTap: {
+                                if quiz.status == .published {
+                                    viewModel.playQuiz(quiz)
+                                } else {
+                                    viewModel.createQuiz()
+                                }
+                            },
+                            onMenuTap: {
+                                viewModel.openQuizMenu(quiz: quiz)
+                            }
+                        )
                     }
                 }
                 .padding(.bottom, 100)

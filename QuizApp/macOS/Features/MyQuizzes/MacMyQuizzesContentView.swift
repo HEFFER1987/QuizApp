@@ -46,43 +46,42 @@ struct MacQuizRowView: View {
     private var glowColor: Color { QuizTheme.glowColor(for: quiz.status) }
 
     var body: some View {
-        Button(action: onSelect) {
-            HStack(spacing: 14) {
-                iconView
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Text(quiz.title)
-                            .font(.system(size: 17, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white)
-                        statusBadge
-                        Spacer()
-                        actionButtons
-                    }
-                    if let categoryLabel = quiz.categoryLabel {
-                        Text(categoryLabel)
-                            .font(.system(size: 13, weight: .regular, design: .rounded))
-                            .foregroundStyle(QuizTheme.mutedText)
-                    }
-                    Text(quiz.inlineStatsText)
-                        .font(.system(size: 12, weight: .regular, design: .rounded))
+        HStack(spacing: 14) {
+            iconView
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text(quiz.title)
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                    statusBadge
+                    Spacer()
+                    actionButtons
+                }
+                if let categoryLabel = quiz.categoryLabel {
+                    Text(categoryLabel)
+                        .font(.system(size: 13, weight: .regular, design: .rounded))
                         .foregroundStyle(QuizTheme.mutedText)
                 }
+                Text(quiz.inlineStatsText)
+                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .foregroundStyle(QuizTheme.mutedText)
             }
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(QuizTheme.cardFill.opacity(isSelected ? 0.95 : 0.75))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(
-                        isSelected ? QuizTheme.publishedGlow : glowColor.opacity(0.45),
-                        lineWidth: isSelected ? 1.8 : 1
-                    )
-            )
-            .shadow(color: isSelected ? QuizTheme.publishedGlow.opacity(0.25) : .clear, radius: 10)
         }
-        .buttonStyle(.plain)
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(QuizTheme.cardFill.opacity(isSelected ? 0.95 : 0.75))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(
+                    isSelected ? QuizTheme.publishedGlow : glowColor.opacity(0.45),
+                    lineWidth: isSelected ? 1.8 : 1
+                )
+        )
+        .shadow(color: isSelected ? QuizTheme.publishedGlow.opacity(0.25) : .clear, radius: 10)
+        .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .onTapGesture(perform: onSelect)
     }
 
     private var iconView: some View {
@@ -208,7 +207,14 @@ struct MacMyQuizzesContentView<ViewModel: QuizListViewModel>: View {
                         MacQuizRowView(
                             quiz: quiz,
                             isSelected: viewModel.selectedQuizID == quiz.id,
-                            onSelect: { viewModel.selectQuiz(quiz) },
+                            onSelect: {
+                                viewModel.selectQuiz(quiz)
+                                if quiz.status == .published {
+                                    viewModel.playQuiz(quiz)
+                                } else {
+                                    viewModel.previewQuiz(quiz)
+                                }
+                            },
                             onPreview: { viewModel.previewQuiz(quiz) },
                             onPlay: { viewModel.playQuiz(quiz) },
                             onMenu: { viewModel.openQuizMenu(quiz: quiz) }

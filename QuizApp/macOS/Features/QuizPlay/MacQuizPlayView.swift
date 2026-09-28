@@ -19,14 +19,16 @@ struct MacQuizPlayView<ViewModel: QuizPlayViewModel>: View {
                     retryTitle: "Try Again",
                     onRetry: { Task { await viewModel.load() } }
                 )
+            } else {
+                SystemLoadingView(message: "Loading quiz...")
             }
         }
-        .padding(24)
-        .task { await viewModel.load() }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(MacSpaceBackgroundView())
         .onAppear { isFocused = true }
         .focusable()
         .onKeyPress(keys: [.return]) { _ in
-            if viewModel.canConfirm { viewModel.confirmAnswer() }
+            if viewModel.canConfirm { viewModel.goNext() }
             return .handled
         }
         .onKeyPress(keys: [.leftArrow]) { _ in
@@ -34,68 +36,24 @@ struct MacQuizPlayView<ViewModel: QuizPlayViewModel>: View {
             return .handled
         }
         .onKeyPress(keys: [.rightArrow]) { _ in
-            if viewModel.canConfirm { viewModel.confirmAnswer() }
+            if viewModel.canConfirm { viewModel.goNext() }
             return .handled
         }
     }
 
     private func playContent(question: QuizPlayQuestion) -> some View {
-        VStack(alignment: .leading, spacing: 20) {
-            HStack {
-                Text(viewModel.quizTitle)
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                Spacer()
-                Text(viewModel.progressText)
-                    .foregroundStyle(QuizTheme.mutedText)
-            }
-            ProgressView(value: Double(viewModel.currentIndex + 1), total: Double(max(viewModel.questions.count, 1)))
-                .tint(QuizTheme.publishedGlow)
-            Text(formatTime(viewModel.elapsedSeconds))
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-            Text(question.prompt)
-                .font(.system(size: 22, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-            VStack(spacing: 10) {
-                ForEach(Array(question.options.enumerated()), id: \.element.id) { index, option in
-                    Button {
-                        viewModel.selectOption(option.id)
-                    } label: {
-                        HStack {
-                            Text("\(index + 1).")
-                                .foregroundStyle(QuizTheme.publishedGlow)
-                            Text(option.text)
-                                .foregroundStyle(.white)
-                            Spacer()
-                            if viewModel.selectedOptionIDs.contains(option.id) {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(QuizTheme.publishedGlow)
-                            }
-                        }
-                        .padding(14)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .fill(QuizTheme.cardFill)
-                        )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            HStack {
-                Spacer()
-                Button("Confirm", action: viewModel.confirmAnswer)
-                    .buttonStyle(.borderedProminent)
-                    .disabled(!viewModel.canConfirm)
-            }
-        }
-    }
+        VStack(spacing: 0) {
+            MacQuizPlayHeader(viewModel: viewModel)
 
-    private func formatTime(_ seconds: Int) -> String {
-        let minutes = seconds / 60
-        let remainder = seconds % 60
-        return String(format: "%02d:%02d", minutes, remainder)
+            HStack(alignment: .top, spacing: 16) {
+                MacQuizPlayQuestionPanel(viewModel: viewModel, question: question)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                MacQuizPlayQuestionsSidebar(viewModel: viewModel)
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 20)
+        }
     }
 }
 
@@ -133,10 +91,24 @@ struct MacQuizSessionResultView<ViewModel: QuizPlayViewModel>: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(24)
     }
 }
 
 #Preview {
-    MacQuizPlayView(viewModel: QuizPlayViewModelImpl(quizID: "1", coordinator: MacQuizPlayCoordinatorImpl()))
-        .background(Color.black)
+    MacQuizPlayPreviewHost()
+        .background(MacSpaceBackgroundView())
+        .frame(width: 1100, height: 720)
+}
+
+private struct MacQuizPlayPreviewHost: View {
+    @StateObject private var viewModel = QuizPlayViewModelImpl(
+        quizID: "1",
+        coordinator: MacQuizPlayCoordinatorImpl()
+    )
+
+    var body: some View {
+        MacQuizPlayView(viewModel: viewModel)
+            .task { await viewModel.load() }
+    }
 }

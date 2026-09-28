@@ -100,6 +100,7 @@ final class MacQuizPlayCoordinatorImpl: QuizPlayCoordinator {
     }
 
     func showSessionResult(_ result: QuizPlaySessionResult) async {
+        await macRootCoordinator?.dismissQuizPlay()
         await macRootCoordinator?.showResultDetail(
             QuizResult(
                 id: result.sessionID,
@@ -118,7 +119,7 @@ final class MacQuizPlayCoordinatorImpl: QuizPlayCoordinator {
     }
 
     func dismiss() async {
-        await macRootCoordinator?.dismissEditor()
+        await macRootCoordinator?.dismissQuizPlay()
     }
 }
 

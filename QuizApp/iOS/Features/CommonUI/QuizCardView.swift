@@ -2,6 +2,7 @@ import SwiftUI
 
 struct QuizCardView: View {
     let quiz: Quiz
+    var onCardTap: (() -> Void)?
     let onMenuTap: () -> Void
 
     private var glowColor: Color {
@@ -29,6 +30,10 @@ struct QuizCardView: View {
         )
         .shadow(color: glowColor.opacity(0.4), radius: 12, x: 0, y: 0)
         .shadow(color: glowColor.opacity(0.2), radius: 4, x: 0, y: 0)
+        .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .onTapGesture {
+            onCardTap?()
+        }
     }
 
     private var iconView: some View {

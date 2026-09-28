@@ -6,9 +6,7 @@ protocol MacRootCoordinatorImplProtocol: MacRootCoordinator {}
 final class MacRootCoordinatorImpl: Coordinator<MacRootRoute>, MacRootCoordinatorImplProtocol {
 
     private lazy var rootViewModel: MacRootViewModel = {
-        let viewModel = MacRootViewModel()
-        viewModel.coordinator = self
-        return viewModel
+        MacRootViewModel(coordinator: self)
     }()
 
     override func start() async {
@@ -34,9 +32,9 @@ final class MacRootCoordinatorImpl: Coordinator<MacRootRoute>, MacRootCoordinato
         rootViewModel.inspectorMode = .profile
     }
 
+    @MainActor
     func showQuizPlay(quizID: String) async {
-        rootViewModel.contentDestination = .quizPlay(quizID)
-        rootViewModel.inspectorMode = .profile
+        rootViewModel.openQuizPlay(quizID: quizID)
     }
 
     func showPublicQuizDetail(quizID: String) async {
@@ -57,5 +55,10 @@ final class MacRootCoordinatorImpl: Coordinator<MacRootRoute>, MacRootCoordinato
         rootViewModel.contentDestination = .sidebar(.myQuizzes)
         rootViewModel.selectedSidebarItem = .myQuizzes
         rootViewModel.inspectorMode = .profile
+    }
+
+    @MainActor
+    func dismissQuizPlay() async {
+        rootViewModel.closeQuizPlay()
     }
 }

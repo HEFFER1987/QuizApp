@@ -34,6 +34,37 @@ final class MacOSViewModelTests: XCTestCase {
     }
 
     @MainActor
+    func testQuizPlayViewModelGoToQuestionPersistsAnswer() async {
+        let viewModel = QuizPlayViewModelImpl(quizID: "1", coordinator: QuizPlayCoordinatorStub())
+        await viewModel.load()
+        guard let first = viewModel.currentQuestion else {
+            XCTFail("Expected question")
+            return
+        }
+        viewModel.selectOption(first.correctOptionIDs.first ?? "")
+        viewModel.goToQuestion(at: 1)
+        XCTAssertTrue(viewModel.isQuestionAnswered(at: 0))
+        viewModel.goToQuestion(at: 0)
+        XCTAssertFalse(viewModel.selectedOptionIDs.isEmpty)
+    }
+
+    @MainActor
+    func testQuizPlayViewModelResetCurrentQuestion() async {
+        let viewModel = QuizPlayViewModelImpl(quizID: "1", coordinator: QuizPlayCoordinatorStub())
+        await viewModel.load()
+        guard let first = viewModel.currentQuestion else {
+            XCTFail("Expected question")
+            return
+        }
+        viewModel.selectOption(first.correctOptionIDs.first ?? "")
+        viewModel.goToQuestion(at: 1)
+        viewModel.goToQuestion(at: 0)
+        viewModel.resetCurrentQuestion()
+        XCTAssertTrue(viewModel.selectedOptionIDs.isEmpty)
+        XCTAssertFalse(viewModel.isQuestionAnswered(at: 0))
+    }
+
+    @MainActor
     func testQuizPublishViewModelCreatesLink() {
         let viewModel = QuizPublishViewModelImpl()
         viewModel.publish(title: "Swift Basics")

@@ -26,14 +26,21 @@ protocol QuizPlayViewModel: ObservableObject {
     var progressText: String { get }
     var canGoBack: Bool { get }
     var canConfirm: Bool { get }
+    var isOnLastQuestion: Bool { get }
 
     func load() async
     func selectOption(_ optionID: String)
     func confirmAnswer()
+    func goNext()
     func goBack()
+    func goToQuestion(at index: Int)
+    func resetCurrentQuestion()
+    func isQuestionAnswered(at index: Int) -> Bool
+    func questionListTitle(at index: Int) -> String
     func finishSession()
     func retry()
     func reviewAnswers()
+    func dismiss()
 }
 
 @MainActor
@@ -48,7 +55,7 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
     @Published private(set) var currentIndex: Int = 0
     @Published private(set) var selectedOptionIDs: Set<String> = []
     @Published private(set) var elapsedSeconds: Int = 0
-    @Published private(set) var isLoading: Bool = false
+    @Published private(set) var isLoading: Bool = true
     @Published private(set) var isComplete: Bool = false
     @Published private(set) var sessionResult: QuizPlaySessionResult?
     @Published var error: QuizPlayError?
@@ -68,6 +75,10 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
 
     var canGoBack: Bool { currentIndex > 0 && !isComplete }
     var canConfirm: Bool { !selectedOptionIDs.isEmpty && !isComplete }
+    var isOnLastQuestion: Bool {
+        guard !questions.isEmpty else { return false }
+        return currentIndex >= questions.count - 1
+    }
 
     init(
         quizID: String,
@@ -115,7 +126,12 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
     }
 
     func confirmAnswer() {
+        goNext()
+    }
+
+    func goNext() {
         guard let question = currentQuestion else { return }
+        guard !selectedOptionIDs.isEmpty else { return }
         answers[question.id] = selectedOptionIDs
         if currentIndex >= questions.count - 1 {
             finishSession()
@@ -127,11 +143,43 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
 
     func goBack() {
         guard canGoBack else { return }
+        persistCurrentAnswerIfNeeded()
         currentIndex -= 1
         selectedOptionIDs = answers[questions[currentIndex].id] ?? []
     }
 
+    func goToQuestion(at index: Int) {
+        guard questions.indices.contains(index), !isComplete else { return }
+        guard index != currentIndex else { return }
+        persistCurrentAnswerIfNeeded()
+        currentIndex = index
+        selectedOptionIDs = answers[questions[currentIndex].id] ?? []
+    }
+
+    func resetCurrentQuestion() {
+        guard let question = currentQuestion else { return }
+        answers.removeValue(forKey: question.id)
+        selectedOptionIDs = []
+    }
+
+    func isQuestionAnswered(at index: Int) -> Bool {
+        guard questions.indices.contains(index) else { return false }
+        let questionID = questions[index].id
+        guard let selection = answers[questionID] else { return false }
+        return !selection.isEmpty
+    }
+
+    func questionListTitle(at index: Int) -> String {
+        guard questions.indices.contains(index) else { return "" }
+        let prompt = questions[index].prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        if prompt.count <= 42 {
+            return prompt
+        }
+        return String(prompt.prefix(39)) + "..."
+    }
+
     func finishSession() {
+        persistCurrentAnswerIfNeeded()
         timerTask?.cancel()
         isComplete = true
         let correct = questions.filter { question in
@@ -161,6 +209,7 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
         isComplete = false
         sessionResult = nil
         elapsedSeconds = 0
+        isLoading = false
         startTimer()
     }
 
@@ -168,6 +217,21 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
         guard let sessionResult else { return }
         Task {
             await coordinator.showSessionResult(sessionResult)
+        }
+    }
+
+    func dismiss() {
+        Task {
+            await coordinator.dismiss()
+        }
+    }
+
+    private func persistCurrentAnswerIfNeeded() {
+        guard let question = currentQuestion else { return }
+        if selectedOptionIDs.isEmpty {
+            answers.removeValue(forKey: question.id)
+        } else {
+            answers[question.id] = selectedOptionIDs
         }
     }
 

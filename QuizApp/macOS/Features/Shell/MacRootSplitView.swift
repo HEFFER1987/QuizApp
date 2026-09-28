@@ -4,21 +4,12 @@ struct MacRootSplitView: View {
     @ObservedObject var viewModel: MacRootViewModel
 
     var body: some View {
-        NavigationSplitView {
-            MacSidebarView(
-                selectedItem: Binding(
-                    get: { viewModel.selectedSidebarItem },
-                    set: { viewModel.selectSidebar($0) }
-                ),
-                onSettingsTap: viewModel.openSettings
-            )
-            .navigationSplitViewColumnWidth(min: 210, ideal: 230, max: 260)
-        } content: {
-            contentColumn
-                .navigationSplitViewColumnWidth(min: 480, ideal: 720, max: 1200)
-        } detail: {
-            inspectorColumn
-                .navigationSplitViewColumnWidth(min: 280, ideal: 320, max: 380)
+        Group {
+            if isQuizPlayActive {
+                quizPlayFullScreen
+            } else {
+                mainSplitView
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(MacSpaceBackgroundView())
@@ -39,8 +30,46 @@ struct MacRootSplitView: View {
             QuizBuilderPreviewView(viewModel: viewModel.quizBuilderViewModel)
                 .frame(minWidth: 700, minHeight: 600)
         }
-        .onChange(of: viewModel.selectedSidebarItem) { _, item in
-            viewModel.contentDestination = .sidebar(item)
+    }
+
+    private var isQuizPlayActive: Bool {
+        if case .quizPlay = viewModel.contentDestination {
+            return true
+        }
+        return false
+    }
+
+    @ViewBuilder
+    private var quizPlayFullScreen: some View {
+        if case .quizPlay(let quizID) = viewModel.contentDestination,
+           let quizPlayViewModel = viewModel.quizPlayViewModel {
+            MacQuizPlayView(viewModel: quizPlayViewModel)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .id(quizID)
+        } else {
+            SystemLoadingView(message: "Loading quiz...")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
+    private var mainSplitView: some View {
+        NavigationSplitView {
+            MacSidebarView(
+                selectedItem: Binding(
+                    get: { viewModel.selectedSidebarItem },
+                    set: { viewModel.selectSidebar($0) }
+                ),
+                onSettingsTap: viewModel.openSettings
+            )
+            .navigationSplitViewColumnWidth(min: 210, ideal: 230, max: 260)
+        } content: {
+            contentColumn
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .id(viewModel.contentDestination)
+                .navigationSplitViewColumnWidth(min: 480, ideal: 720, max: 1200)
+        } detail: {
+            inspectorColumn
+                .navigationSplitViewColumnWidth(min: 280, ideal: 320, max: 380)
         }
     }
 
@@ -49,6 +78,9 @@ struct MacRootSplitView: View {
         switch viewModel.contentDestination {
         case .sidebar(let item):
             sidebarContent(item)
+        case .quizPlay:
+            SystemLoadingView(message: "Loading quiz...")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         case .quizEditor:
             MacQuizEditorView(
                 viewModel: viewModel.quizBuilderViewModel,
@@ -62,8 +94,6 @@ struct MacRootSplitView: View {
             )
         case .resultDetail(let id):
             MacResultDetailSplitView(viewModel: viewModel.makeResultDetailViewModel(resultID: id))
-        case .quizPlay(let id):
-            MacQuizPlayView(viewModel: viewModel.makeQuizPlayViewModel(quizID: id))
         case .publicQuizDetail(let id):
             MacPublicQuizDetailView(
                 quizID: id,

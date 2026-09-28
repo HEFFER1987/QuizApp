@@ -3,6 +3,7 @@ import SUICoordinator
 
 protocol MainTabCoordinator {
     func showQuizBuilder() async
+    func showQuizPlay(quizID: String) async
     func showResultDetail(_ result: QuizResult) async
 }
 
@@ -26,6 +27,11 @@ class MainTabCoordinatorImpl: Coordinator<MainTabRoute>, MainTabCoordinator {
 
     func showQuizBuilder() async {
         let coordinator = QuizBuilderCoordinatorImpl()
+        await navigate(to: coordinator, presentationStyle: .push)
+    }
+
+    func showQuizPlay(quizID: String) async {
+        let coordinator = QuizPlayCoordinatorImpl(quizID: quizID, mainTabCoordinator: self)
         await navigate(to: coordinator, presentationStyle: .push)
     }
 

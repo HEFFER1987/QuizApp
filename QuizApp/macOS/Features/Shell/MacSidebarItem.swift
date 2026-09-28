@@ -32,7 +32,7 @@ enum MacInspectorMode: Equatable {
     case question
 }
 
-enum MacContentDestination: Equatable {
+enum MacContentDestination: Equatable, Hashable {
     case sidebar(MacSidebarItem)
     case quizEditor
     case resultDetail(String)

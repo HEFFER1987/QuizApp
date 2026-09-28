@@ -43,7 +43,7 @@ struct QuizBuilderPreviewInfoCard: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(QuizBuilderPreviewCardBackground())
+        .background(QuizPlayCardBackground())
     }
 
     private var coverIcon: some View {
@@ -78,57 +78,6 @@ struct QuizBuilderPreviewInfoCard: View {
     }
 }
 
-struct QuizBuilderPreviewOptionRow: View {
-    let letter: String
-    let text: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 12) {
-                Text(letter)
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
-                    .foregroundStyle(isSelected ? QuizTheme.draftGlow : QuizTheme.publishedGlow.opacity(0.9))
-                    .frame(width: 28, height: 28)
-                    .overlay(
-                        Circle()
-                            .stroke(
-                                isSelected ? QuizTheme.draftGlow : QuizTheme.publishedGlow.opacity(0.55),
-                                lineWidth: 1.4
-                            )
-                    )
-
-                Text(text)
-                    .font(.system(size: 16, weight: .medium, design: .rounded))
-                    .foregroundStyle(isSelected ? .white : QuizTheme.mutedText)
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 14)
-            .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(Color.black.opacity(0.28))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(
-                        isSelected ? QuizTheme.draftGlow : Color.white.opacity(0.1),
-                        lineWidth: isSelected ? 1.6 : 1
-                    )
-            )
-            .shadow(
-                color: isSelected ? QuizTheme.draftGlow.opacity(0.45) : .clear,
-                radius: 10,
-                x: 0,
-                y: 0
-            )
-        }
-        .buttonStyle(.plain)
-    }
-}
-
 struct QuizBuilderPreviewQuestionCard: View {
     let question: QuizBuilderQuestion
     let currentIndex: Int
@@ -155,7 +104,7 @@ struct QuizBuilderPreviewQuestionCard: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(QuizBuilderPreviewCardBackground())
+        .background(QuizPlayCardBackground())
     }
 
     private var progressHeader: some View {
@@ -164,28 +113,23 @@ struct QuizBuilderPreviewQuestionCard: View {
                 .font(.system(size: 13, weight: .medium, design: .rounded))
                 .foregroundStyle(QuizTheme.publishedGlow.opacity(0.9))
 
-            GeometryReader { geometry in
-                let progress = CGFloat(currentIndex + 1) / CGFloat(max(total, 1))
-                ZStack(alignment: .leading) {
-                    Capsule(style: .continuous)
-                        .fill(Color.white.opacity(0.12))
-                    Capsule(style: .continuous)
-                        .fill(QuizTheme.draftGlow)
-                        .frame(width: max(geometry.size.width * min(max(progress, 0), 1), 0))
-                        .shadow(color: QuizTheme.draftGlow.opacity(0.45), radius: 4, x: 0, y: 0)
-                }
-            }
-            .frame(height: 4)
+            QuizPlayProgressHeader(
+                currentIndex: currentIndex,
+                total: total,
+                accent: QuizTheme.draftGlow,
+                showsNumericLabel: false
+            )
         }
     }
 
     private var optionsList: some View {
         VStack(spacing: 10) {
             ForEach(Array(filledOptions.enumerated()), id: \.element.id) { index, option in
-                QuizBuilderPreviewOptionRow(
-                    letter: QuizBuilderPreviewOptionLetter.letter(at: index),
+                QuizPlayOptionRow(
+                    letter: QuizPlayOptionLetter.letter(at: index),
                     text: option.text,
                     isSelected: isOptionSelected(option.id),
+                    accent: QuizTheme.draftGlow,
                     action: { onSelectOption(option.id) }
                 )
             }
@@ -285,7 +229,7 @@ struct QuizBuilderPreviewNumberStrip: View {
             .padding(.horizontal, 4)
             .padding(.vertical, 10)
         }
-        .background(QuizBuilderPreviewCardBackground(cornerRadius: 14))
+        .background(QuizPlayCardBackground(cornerRadius: 14))
     }
 
     private func numberButton(index: Int) -> some View {
@@ -321,23 +265,10 @@ struct QuizBuilderPreviewNumberStrip: View {
     }
 }
 
-struct QuizBuilderPreviewCardBackground: View {
-    var cornerRadius: CGFloat = 20
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-            .fill(QuizTheme.cardFill)
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .stroke(Color.white.opacity(0.08), lineWidth: 1)
-            )
-    }
-}
+typealias QuizBuilderPreviewCardBackground = QuizPlayCardBackground
 
 enum QuizBuilderPreviewOptionLetter {
     static func letter(at index: Int) -> String {
-        let base = Int(UnicodeScalar("A").value)
-        guard let scalar = UnicodeScalar(base + index) else { return "?" }
-        return String(scalar)
+        QuizPlayOptionLetter.letter(at: index)
     }
 }
