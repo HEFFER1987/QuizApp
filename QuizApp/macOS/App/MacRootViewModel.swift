@@ -35,16 +35,22 @@ final class MacRootViewModel: ObservableObject {
     init(coordinator: MacRootCoordinator? = nil) {
         self.coordinator = coordinator
         self.quizListViewModel = QuizListViewModelImpl(
-            coordinator: MacQuizListCoordinatorImpl(macRootCoordinator: coordinator)
+            coordinator: MacQuizListCoordinatorImpl(macRootCoordinator: coordinator),
+            quizRepository: AppDependencies.makeQuizRepository()
         )
         self.resultsViewModel = ResultsViewModelImpl(
-            coordinator: MacResultsCoordinatorImpl(macRootCoordinator: coordinator)
+            coordinator: MacResultsCoordinatorImpl(macRootCoordinator: coordinator),
+            resultsRepository: AppDependencies.makeResultsRepository()
         )
         self.profileViewModel = ProfileViewModelImpl(
-            coordinator: MacProfileCoordinatorImpl(macRootCoordinator: coordinator)
+            coordinator: MacProfileCoordinatorImpl(macRootCoordinator: coordinator),
+            profileRepository: AppDependencies.makeProfileRepository(),
+            quizRepository: AppDependencies.makeQuizRepository(),
+            resultsRepository: AppDependencies.makeResultsRepository()
         )
         self.exploreViewModel = ExploreViewModelImpl(
-            coordinator: ExploreCoordinatorImpl(macRootCoordinator: coordinator)
+            coordinator: ExploreCoordinatorImpl(macRootCoordinator: coordinator),
+            repository: AppDependencies.makeExploreRepository()
         )
         self.settingsViewModel = SettingsViewModelImpl()
         self.quizBuilderViewModel = QuizBuilderViewModelImpl(
@@ -68,7 +74,8 @@ final class MacRootViewModel: ObservableObject {
     func makeQuizPlayViewModel(quizID: String) -> QuizPlayViewModelImpl {
         QuizPlayViewModelImpl(
             quizID: quizID,
-            coordinator: MacQuizPlayCoordinatorImpl(macRootCoordinator: coordinator)
+            coordinator: MacQuizPlayCoordinatorImpl(macRootCoordinator: coordinator),
+            repository: AppDependencies.makeQuizPlayRepository()
         )
     }
 
@@ -78,7 +85,8 @@ final class MacRootViewModel: ObservableObject {
             coordinator: MacResultDetailCoordinatorImpl(
                 resultId: resultID,
                 macRootCoordinator: coordinator
-            )
+            ),
+            resultsRepository: AppDependencies.makeResultsRepository()
         )
     }
 }

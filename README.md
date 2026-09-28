@@ -49,6 +49,18 @@ brew install xcodegen swiftgen swiftlint
 
 Re-run `./generate.sh` after changing `project.yml` or assets that SwiftGen tracks.
 
+## Mock build (no Firebase)
+
+For local UI work without Firebase config or network auth, use the **Debug-Mock** configuration (`MOCK_DATA` compile flag):
+
+1. Run `./generate.sh` after pulling changes to `project.yml`.
+2. In Xcode, select **`QuizApp-iOS-Mock`** or **`QuizApp-macOS-Mock`**.
+3. Run — Firebase is not configured, quiz/profile data comes from `*RepositoryMock`, and auth uses `AuthManagerMock`.
+
+On first launch without a saved session, the app auto-signs in as `mock-user`. **Sign Out** in Settings shows Login; email/password sign-in uses mock auth. Google/Apple sign-in is unavailable in this build.
+
+Firebase plists under `FirebaseConfigs/` are **not** required for Mock schemes (the copy script is skipped).
+
 ## Project structure
 
 ```

@@ -1,6 +1,8 @@
 import Foundation
 import AuthenticationServices
+#if !MOCK_DATA
 import FirebaseAuth
+#endif
 
 enum SignUpError: Error {
     case emailEmpty
@@ -37,8 +39,8 @@ final class SignUpViewModelImpl: AuthViewModelBase, SignUpViewModel {
 
     init(
         coordinator: SignUpCoordinator,
-        authManager: AuthManager = AuthManagerImp(),
-        googleSignInProvider: GoogleSignInProviding = GoogleSignInProvider()
+        authManager: AuthManager? = nil,
+        googleSignInProvider: GoogleSignInProviding? = nil
     ) {
         self.coordinator = coordinator
         super.init(
@@ -78,16 +80,8 @@ final class SignUpViewModelImpl: AuthViewModelBase, SignUpViewModel {
             do {
                 let userId = try await authManager.signUp(method: .email(email: email, password: password))
                 await handleAuthSuccess(userId: userId, provider: .email)
-            } catch let signUpError as NSError where signUpError.code == AuthErrorCode.emailAlreadyInUse.rawValue {
-                do {
-                    let userId = try await authManager.signIn(method: .email(email: email, password: password))
-                    await handleAuthSuccess(userId: userId, provider: .email)
-                } catch {
-                    self.error = .emailAlreadyInUse
-                }
             } catch {
-                Logger.shared.log("Firebase register failed: \(error)", level: .error)
-                self.error = .firebase(error: error)
+                await handleEmailSignUpFailure(error, email: email, password: password)
             }
         }
     }
@@ -165,6 +159,27 @@ final class SignUpViewModelImpl: AuthViewModelBase, SignUpViewModel {
                 await MainActor.run { self.error = .firebase(error: error) }
             }
         }
+    }
+
+    @MainActor
+    private func handleEmailSignUpFailure(_ error: Error, email: String, password: String) async {
+        #if MOCK_DATA
+        Logger.shared.log("Mock register failed: \(error)", level: .error)
+        self.error = .firebase(error: error)
+        #else
+        let nsError = error as NSError
+        if nsError.code == AuthErrorCode.emailAlreadyInUse.rawValue {
+            do {
+                let userId = try await authManager.signIn(method: .email(email: email, password: password))
+                await handleAuthSuccess(userId: userId, provider: .email)
+            } catch {
+                self.error = .emailAlreadyInUse
+            }
+        } else {
+            Logger.shared.log("Firebase register failed: \(error)", level: .error)
+            self.error = .firebase(error: error)
+        }
+        #endif
     }
 
     @MainActor

@@ -34,6 +34,7 @@ Concise rules for AI agents and contributors working on QuizApp. Keep this file 
 ## 6. Do
 - Cover non-trivial business logic with unit tests using mock services (mock the DI protocols, not concrete types).
 - Keep modules structured so they could be extracted into SPM packages later.
+- Wire new repositories and auth through [`AppDependencies`](QuizApp/Shared/Core/AppDependencies.swift). Guard Firebase-specific code with `#if !MOCK_DATA` so **QuizApp-*-Mock** schemes keep building.
 
 ## 7. Don't
 - No `fatalError()` or force unwraps (`!`, `as!`, `try!`) in production code.

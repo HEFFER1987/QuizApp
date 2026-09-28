@@ -13,7 +13,8 @@ final class ResultDetailCoordinatorImpl: Coordinator<DefaultRoute>, ResultDetail
     override func start() async {
         let viewModel = ResultDetailViewModelImpl(
             resultId: resultId,
-            coordinator: self
+            coordinator: self,
+            resultsRepository: AppDependencies.makeResultsRepository()
         )
         let route = DefaultRoute(presentationStyle: .push, content: {
             ResultDetailView(viewModel: viewModel)

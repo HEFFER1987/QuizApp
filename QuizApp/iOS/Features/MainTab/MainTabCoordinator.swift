@@ -35,14 +35,25 @@ class MainTabCoordinatorImpl: Coordinator<MainTabRoute>, MainTabCoordinator {
     }
 
     func makeQuizListViewModel() -> QuizListViewModelImpl {
-        QuizListViewModelImpl(coordinator: quizListCoordinator)
+        QuizListViewModelImpl(
+            coordinator: quizListCoordinator,
+            quizRepository: AppDependencies.makeQuizRepository()
+        )
     }
 
     func makeResultsViewModel() -> ResultsViewModelImpl {
-        ResultsViewModelImpl(coordinator: resultsCoordinator)
+        ResultsViewModelImpl(
+            coordinator: resultsCoordinator,
+            resultsRepository: AppDependencies.makeResultsRepository()
+        )
     }
 
     func makeProfileViewModel() -> ProfileViewModelImpl {
-        ProfileViewModelImpl(coordinator: profileCoordinator)
+        ProfileViewModelImpl(
+            coordinator: profileCoordinator,
+            profileRepository: AppDependencies.makeProfileRepository(),
+            quizRepository: AppDependencies.makeQuizRepository(),
+            resultsRepository: AppDependencies.makeResultsRepository()
+        )
     }
 }

@@ -1,6 +1,4 @@
 import Foundation
-import FirebaseCore
-import FirebaseAuth
 
 enum AuthMethod {
     case email(email: String, password: String)
@@ -8,66 +6,26 @@ enum AuthMethod {
     case apple(idToken: String, rawNonce: String)
 }
 
+enum MockAuthError: Error {
+    case socialSignInUnavailable
+}
+
 protocol AuthManager {
     func signUp(method: AuthMethod) async throws -> String
     func signIn(method: AuthMethod) async throws -> String
 }
 
-final class AuthManagerImp: AuthManager {
-    private let auth: Auth = Auth.auth()
-
+struct AuthManagerMock: AuthManager {
     func signUp(method: AuthMethod) async throws -> String {
-        switch method {
-        case .email(let email, let password):
-            return try await registerInFirebase(email: email, password: password)
-        case .google(let idToken, let accessToken):
-            return try await registerInFirebaseWithGoogle(idToken: idToken, accessToken: accessToken)
-        case .apple(let idToken, let rawNonce):
-            return try await registerInFirebaseWithApple(idToken: idToken, rawNonce: rawNonce)
-        }
+        try await signIn(method: method)
     }
 
     func signIn(method: AuthMethod) async throws -> String {
         switch method {
-        case .email(let email, let password):
-            return try await signInInFirebase(email: email, password: password)
-        case .google(let idToken, let accessToken):
-            return try await signUpWithGoogleInFirebase(idToken: idToken, accessToken: accessToken)
-        case .apple(let idToken, let rawNonce):
-            return try await signUpWithAppleInFirebase(idToken: idToken, rawNonce: rawNonce)
+        case .email:
+            return AppDependencies.mockUserId
+        case .google, .apple:
+            throw MockAuthError.socialSignInUnavailable
         }
-    }
-
-    // MARK: - Firebase
-    func registerInFirebase(email: String, password: String) async throws -> String {
-        let result = try await auth.createUser(withEmail: email, password: password)
-        return result.user.uid
-    }
-
-    func signInInFirebase(email: String, password: String) async throws -> String {
-        let result = try await auth.signIn(withEmail: email, password: password)
-        return result.user.uid
-    }
-
-    // MARK: - Google
-    func registerInFirebaseWithGoogle(idToken: String, accessToken: String) async throws -> String {
-        try await signUpWithGoogleInFirebase(idToken: idToken, accessToken: accessToken)
-    }
-
-    func signUpWithGoogleInFirebase(idToken: String, accessToken: String) async throws -> String {
-        let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
-        let result = try await auth.signIn(with: credential)
-        return result.user.uid
-    }
-
-    // MARK: - Apple
-    func registerInFirebaseWithApple(idToken: String, rawNonce: String) async throws -> String {
-        try await signUpWithAppleInFirebase(idToken: idToken, rawNonce: rawNonce)
-    }
-
-    func signUpWithAppleInFirebase(idToken: String, rawNonce: String) async throws -> String {
-        let credential = OAuthProvider.appleCredential(withIDToken: idToken, rawNonce: rawNonce, fullName: nil)
-        let result = try await auth.signIn(with: credential)
-        return result.user.uid
     }
 }

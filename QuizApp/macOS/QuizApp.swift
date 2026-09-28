@@ -1,6 +1,8 @@
 import SwiftUI
 import SUICoordinator
+#if !MOCK_DATA
 import FirebaseCore
+#endif
 
 @main
 struct QuizAppApp: App {

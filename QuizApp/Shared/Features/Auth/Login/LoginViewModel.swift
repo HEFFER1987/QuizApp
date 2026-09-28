@@ -33,8 +33,8 @@ final class LoginViewModelImpl: AuthViewModelBase, LoginViewModel {
 
     init(
         coordinator: LoginCoordinator,
-        authManager: AuthManager = AuthManagerImp(),
-        googleSignInProvider: GoogleSignInProviding = GoogleSignInProvider()
+        authManager: AuthManager? = nil,
+        googleSignInProvider: GoogleSignInProviding? = nil
     ) {
         self.coordinator = coordinator
         super.init(

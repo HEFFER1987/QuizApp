@@ -36,6 +36,18 @@ final class LaunchViewModelImpl: LaunchViewModel {
     func startTimer() async {
         do {
             try await Task.sleep(for: .seconds(3))
+            #if MOCK_DATA
+            if !AppStateManager.shared.authorizationState.isAuthorized {
+                AppStateManager.shared.setAuthorized(
+                    userId: AppDependencies.mockUserId,
+                    provider: .email
+                )
+            }
+            await coordinator.showMainApp()
+            #if os(macOS)
+            hideLaunchContent()
+            #endif
+            #else
             if AppStateManager.shared.authorizationState.isAuthorized {
                 await coordinator.showMainApp()
                 #if os(macOS)
@@ -50,6 +62,7 @@ final class LaunchViewModelImpl: LaunchViewModel {
                 await coordinator.showLogin()
                 #endif
             }
+            #endif
         } catch {
             print("Error starting timer: \(error)")
         }

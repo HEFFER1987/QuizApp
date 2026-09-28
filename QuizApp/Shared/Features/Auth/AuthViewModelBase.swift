@@ -9,11 +9,11 @@ class AuthViewModelBase: ObservableObject {
     @Published var isLoading: Bool = false
 
     init(
-        authManager: AuthManager = AuthManagerImp(),
-        googleSignInProvider: GoogleSignInProviding = GoogleSignInProvider()
+        authManager: AuthManager? = nil,
+        googleSignInProvider: GoogleSignInProviding? = nil
     ) {
-        self.authManager = authManager
-        self.googleSignInProvider = googleSignInProvider
+        self.authManager = authManager ?? AppDependencies.makeAuthManager()
+        self.googleSignInProvider = googleSignInProvider ?? AppDependencies.makeGoogleSignInProvider()
     }
 
     func googleSignInTokens() async throws -> GoogleSignInTokens {
