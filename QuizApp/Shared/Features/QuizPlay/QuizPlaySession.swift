@@ -76,12 +76,12 @@ struct QuizPlayRepositoryMock: QuizPlayRepository {
     private static let sampleQuestions: [QuizPlayQuestion] = [
         QuizPlayQuestion(
             id: "1",
-            prompt: "What is the result of the following code?",
+            prompt: "What is Swift?",
             options: [
-                QuizPlayOption(id: "a", text: "[1, 2, 3]"),
-                QuizPlayOption(id: "b", text: "[2, 4, 6]"),
-                QuizPlayOption(id: "c", text: "[1, 4, 9]"),
-                QuizPlayOption(id: "d", text: "[3, 6, 9]")
+                QuizPlayOption(id: "1a", text: "A programming language"),
+                QuizPlayOption(id: "1b", text: "A bird species"),
+                QuizPlayOption(id: "1c", text: "A database"),
+                QuizPlayOption(id: "1d", text: "An IDE")
             ],
             type: .singleChoice,
             correctOptionIDs: ["1a"],
@@ -126,7 +126,8 @@ struct QuizPlayRepositoryMock: QuizPlayRepository {
             type: .singleChoice,
             correctOptionIDs: ["4b"],
             categoryLabel: "Swift Basics",
-            codeSnippet: mapCodeSnippet
+            codeSnippet: mapCodeSnippet,
+            explanation: "Correct answer: B — map doubles each element to [2, 4, 6]."
         ),
         QuizPlayQuestion(
             id: "5",

@@ -127,7 +127,7 @@ struct QuizPlayCodeSnippetView: View {
     }
 }
 
-struct QuizPlayOptionRow: View {
+struct QuizPlayAnswerOptionRow: View {
     let letter: String
     let text: String
     let state: QuizPlayOptionVisualState
