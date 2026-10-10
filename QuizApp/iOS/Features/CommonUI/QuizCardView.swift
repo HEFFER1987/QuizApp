@@ -15,8 +15,6 @@ struct QuizCardView: View {
             contentView
         }
         .padding(16)
-        .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .onTapGesture(perform: onCardTap)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(QuizTheme.cardFill)

@@ -174,20 +174,6 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
         selectedOptionIDs = answers[questions[currentIndex].id] ?? []
     }
 
-    func goNext() {
-        guard let question = currentQuestion else { return }
-        guard !selectedOptionIDs.isEmpty else { return }
-        answers[question.id] = selectedOptionIDs
-        isCurrentQuestionEvaluated = false
-
-        if currentIndex >= questions.count - 1 {
-            finishSession()
-            return
-        }
-        currentIndex += 1
-        selectedOptionIDs = answers[questions[currentIndex].id] ?? []
-    }
-
     func goBack() {
         guard canGoBack else { return }
         if isCurrentQuestionEvaluated {
@@ -319,15 +305,6 @@ final class QuizPlayViewModelImpl: QuizPlayViewModel {
                 !question.explanation.isEmpty
         else { return false }
         return true
-    }
-
-    private func persistCurrentAnswerIfNeeded() {
-        guard let question = currentQuestion else { return }
-        if selectedOptionIDs.isEmpty {
-            answers.removeValue(forKey: question.id)
-        } else {
-            answers[question.id] = selectedOptionIDs
-        }
     }
 
     private func startTimer() {
