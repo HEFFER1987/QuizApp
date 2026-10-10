@@ -6,7 +6,9 @@ import FirebaseAuth
 
 enum SignUpError: Error {
     case emailEmpty
+    case emailInvalid
     case passwordEmpty
+    case passwordTooShort
     case confirmPasswordEmpty
     case passwordMismatch
     case emailAlreadyInUse
@@ -21,8 +23,15 @@ protocol SignUpViewModel: ObservableObject {
     var email: String { get set }
     var password: String { get set }
     var confirmPassword: String { get set }
+    var emailValidationMessage: String? { get }
+    var passwordValidationMessage: String? { get }
+    var confirmPasswordValidationMessage: String? { get }
     var isLoading: Bool { get }
     var error: SignUpError? { get }
+
+    func clearEmailValidation()
+    func clearPasswordValidation()
+    func clearConfirmPasswordValidation()
 
     func signUp()
     func login()
@@ -35,7 +44,12 @@ final class SignUpViewModelImpl: AuthViewModelBase, SignUpViewModel {
     let coordinator: SignUpCoordinator
 
     @Published var confirmPassword: String = ""
+    @Published var confirmPasswordValidationMessage: String?
     @Published var error: SignUpError?
+
+    func clearConfirmPasswordValidation() {
+        confirmPasswordValidationMessage = nil
+    }
 
     init(
         coordinator: SignUpCoordinator,
@@ -50,24 +64,24 @@ final class SignUpViewModelImpl: AuthViewModelBase, SignUpViewModel {
     }
 
     func signUp() {
-        let email = self.email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let email = AuthCredentialsValidator.normalizedEmail(self.email)
         let password = self.password
         let confirmPassword = self.confirmPassword
+        let validation = AuthCredentialsValidator.validateSignUp(
+            email: self.email,
+            password: password,
+            confirmPassword: confirmPassword
+        )
+        emailValidationMessage = validation.email
+        passwordValidationMessage = validation.password
+        confirmPasswordValidationMessage = validation.confirmPassword
 
-        guard !email.isEmpty else {
-            self.error = .emailEmpty
-            return
-        }
-        guard !password.isEmpty, !confirmPassword.isEmpty else {
-            self.error = .passwordEmpty
-            return
-        }
-        guard password == confirmPassword else {
-            self.error = .passwordMismatch
-            return
-        }
-        guard !confirmPassword.isEmpty else {
-            self.error = .confirmPasswordEmpty
+        guard validation.isValid else {
+            self.error = AuthCredentialsValidator.signUpError(
+                email: self.email,
+                password: password,
+                confirmPassword: confirmPassword
+            )
             return
         }
 
@@ -193,13 +207,17 @@ extension SignUpError {
     var userMessage: String {
         switch self {
         case .emailEmpty:
-            return "Enter your email address."
+            return Strings.Auth.Validation.Email.empty
+        case .emailInvalid:
+            return Strings.Auth.Validation.Email.invalid
         case .passwordEmpty:
-            return "Enter and confirm your password."
+            return Strings.Auth.Validation.Password.empty
+        case .passwordTooShort:
+            return Strings.Auth.Validation.Password.tooShort(AuthCredentialsValidator.minimumPasswordLength)
         case .confirmPasswordEmpty:
-            return "Confirm your password."
+            return Strings.Auth.Validation.ConfirmPassword.empty
         case .passwordMismatch:
-            return "Passwords do not match."
+            return Strings.Auth.Validation.Password.mismatch
         case .emailAlreadyInUse:
             return "This email is already registered. Use Login or try a different password."
         case .appleIDCredentialEmpty, .rawNonceEmpty, .idTokenEmpty:

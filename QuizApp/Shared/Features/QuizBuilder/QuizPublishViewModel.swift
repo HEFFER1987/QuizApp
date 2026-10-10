@@ -41,6 +41,7 @@ final class QuizPublishViewModelImpl: QuizPublishViewModel {
     @Published private(set) var isPublishing: Bool = false
 
     func publish(title: String) {
+        guard AppStateManager.shared.canPublishContent else { return }
         isPublishing = true
         defer { isPublishing = false }
         let slug = title

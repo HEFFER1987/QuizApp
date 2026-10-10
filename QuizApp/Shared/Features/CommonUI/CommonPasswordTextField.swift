@@ -5,6 +5,7 @@ struct CommonPasswordField: View {
     @Binding var text: String
     @Binding var isVisible: Bool
     var submitLabel: SubmitLabel = .done
+    var showsValidationError: Bool = false
 
     var body: some View {
         HStack(spacing: 10) {
@@ -35,7 +36,10 @@ struct CommonPasswordField: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(.black.opacity(0.06), lineWidth: 1)
+                .stroke(
+                    showsValidationError ? Color.red.opacity(0.75) : .black.opacity(0.06),
+                    lineWidth: showsValidationError ? 1.5 : 1
+                )
         )
         .shadow(color: .black.opacity(0.22), radius: 10, x: 0, y: 8)
     }

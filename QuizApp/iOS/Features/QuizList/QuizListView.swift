@@ -21,11 +21,13 @@ struct QuizListView<ViewModel: QuizListViewModel>: View {
         .padding(.horizontal, 20)
         .padding(.top, 8)
         .overlay(alignment: .bottomTrailing) {
-            FloatingActionButton {
-                viewModel.createQuiz()
+            if viewModel.canAuthorQuizzes {
+                FloatingActionButton {
+                    viewModel.createQuiz()
+                }
+                .padding(.trailing, 20)
+                .padding(.bottom, 84)
             }
-            .padding(.trailing, 20)
-            .padding(.bottom, 84)
         }
         .task {
             await viewModel.loadQuizzes()
@@ -38,21 +40,23 @@ struct QuizListView<ViewModel: QuizListViewModel>: View {
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
             Spacer()
-            Button {
-                viewModel.createQuiz()
-            } label: {
-                Image(systemName: "plus")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
-                    .background(Circle().fill(QuizTheme.cardFill))
-                    .overlay(
-                        Circle()
-                            .stroke(QuizTheme.draftGlow.opacity(0.85), lineWidth: 1.5)
-                    )
-                    .shadow(color: QuizTheme.draftGlow.opacity(0.45), radius: 8, x: 0, y: 0)
+            if viewModel.canAuthorQuizzes {
+                Button {
+                    viewModel.createQuiz()
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 36, height: 36)
+                        .background(Circle().fill(QuizTheme.cardFill))
+                        .overlay(
+                            Circle()
+                                .stroke(QuizTheme.draftGlow.opacity(0.85), lineWidth: 1.5)
+                        )
+                        .shadow(color: QuizTheme.draftGlow.opacity(0.45), radius: 8, x: 0, y: 0)
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
     }
 

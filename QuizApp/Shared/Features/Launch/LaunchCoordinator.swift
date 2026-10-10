@@ -5,6 +5,9 @@ import SUICoordinator
 protocol LaunchCoordinator {
     func showLogs() async
     func showLogin() async
+    #if os(iOS)
+    func showWelcome() async
+    #endif
     func showMainApp() async
     #if os(macOS)
     func makeLoginCoordinator() async -> LoginCoordinatorImpl
@@ -30,6 +33,16 @@ class LaunchCoordinatorImpl: Coordinator<LaunchRoute>, LaunchCoordinator {
             presentationStyle: .platformRootFlow
         )
     }
+
+    #if os(iOS)
+    func showWelcome() async {
+        let coordinator = WelcomeCoordinatorImpl()
+        await navigate(
+            to: coordinator,
+            presentationStyle: .platformRootFlow
+        )
+    }
+    #endif
 
     func showMainApp() async {
         #if os(macOS)

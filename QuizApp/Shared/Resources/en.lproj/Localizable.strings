@@ -1,3 +1,22 @@
+"welcome.brand" = "QUIZ";
+"welcome.titlePrefix" = "Welcome to ";
+"welcome.titleAccent" = "QUIZ!";
+"welcome.subtitle" = "Explore, learn and challenge yourself with amazing quizzes.";
+"welcome.guest.title" = "Continue as Guest";
+"welcome.guest.subtitle" = "Take quizzes, view results and explore public content.";
+"welcome.guest.badge" = "Limited features";
+"welcome.account.title" = "Create an Account";
+"welcome.account.subtitle" = "Create your own quizzes, share them and get full access to all features.";
+"welcome.account.badge" = "Full access";
+"welcome.feature.takeQuizzes" = "Take quizzes from others";
+"welcome.feature.trackProgress" = "Track your progress";
+"welcome.feature.createShare" = "Create & share your own quizzes";
+"profile.guest.title" = "Guest mode";
+"profile.guest.subtitle" = "Your progress is saved on this device. Register to create quizzes and publish content.";
+"profile.guest.register" = "Create an Account";
+"profile.guest.emptyQuizzes" = "Create quizzes after you register.";
+"profile.guest.statisticsTitle" = "Your local progress";
+
 "login.welcome.title" = "Welcome Back!";
 "login.welcome.subtitle" = "Log in to your account and continue your journey of knowledge";
 "login.continueWith" = "Or continue with";
@@ -22,6 +41,13 @@
 "common.email.placeholder" = "Email";
 "common.password.placeholder" = "Password";
 "common.action.signup" = "Sign Up";
+
+"auth.validation.email.empty" = "Enter your email address.";
+"auth.validation.email.invalid" = "Enter a valid email address.";
+"auth.validation.password.empty" = "Enter your password.";
+"auth.validation.password.tooShort" = "Password must be at least %d characters.";
+"auth.validation.confirmPassword.empty" = "Confirm your password.";
+"auth.validation.password.mismatch" = "Passwords do not match.";
 
 "quizList.title" = "My QUIZes";
 "quizList.search.placeholder" = "Search quizzes";

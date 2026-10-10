@@ -32,35 +32,55 @@ struct SignUpView<ViewModel: SignUpViewModel>: View {
             }
 
             VStack(spacing: 14) {
-                CommonTextField(
-                    placeholder: Strings.Common.Email.placeholder,
-                    text: $viewModel.email,
-                    submitLabel: .next
-                )
-                #if os(iOS)
-                .textInputAutocapitalization(.never)
-                #endif
-                .autocorrectionDisabled()
-                .focused($focusedField, equals: .email)
-                .onSubmit { focusedField = .password }
+                AuthFormValidatedField(validationMessage: viewModel.emailValidationMessage) {
+                    CommonTextField(
+                        placeholder: Strings.Common.Email.placeholder,
+                        text: $viewModel.email,
+                        submitLabel: .next,
+                        showsValidationError: viewModel.emailValidationMessage != nil
+                    )
+                    #if os(iOS)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.emailAddress)
+                    .textContentType(.emailAddress)
+                    #endif
+                    .autocorrectionDisabled()
+                    .focused($focusedField, equals: .email)
+                    .onSubmit { focusedField = .password }
+                    .onChange(of: viewModel.email) { _, _ in
+                        viewModel.clearEmailValidation()
+                    }
+                }
 
-                CommonPasswordField(
-                    placeholder: Strings.Common.Password.placeholder,
-                    text: $viewModel.password,
-                    isVisible: $isPasswordVisible,
-                    submitLabel: .next
-                )
-                .focused($focusedField, equals: .password)
-                .onSubmit { focusedField = .confirmPassword }
+                AuthFormValidatedField(validationMessage: viewModel.passwordValidationMessage) {
+                    CommonPasswordField(
+                        placeholder: Strings.Common.Password.placeholder,
+                        text: $viewModel.password,
+                        isVisible: $isPasswordVisible,
+                        submitLabel: .next,
+                        showsValidationError: viewModel.passwordValidationMessage != nil
+                    )
+                    .focused($focusedField, equals: .password)
+                    .onSubmit { focusedField = .confirmPassword }
+                    .onChange(of: viewModel.password) { _, _ in
+                        viewModel.clearPasswordValidation()
+                    }
+                }
 
-                CommonPasswordField(
-                    placeholder: Strings.Signup.Confirm.Password.placeholder,
-                    text: $viewModel.confirmPassword,
-                    isVisible: $isConfirmPasswordVisible,
-                    submitLabel: .go
-                )
-                .focused($focusedField, equals: .confirmPassword)
-                .onSubmit { viewModel.signUp() }
+                AuthFormValidatedField(validationMessage: viewModel.confirmPasswordValidationMessage) {
+                    CommonPasswordField(
+                        placeholder: Strings.Signup.Confirm.Password.placeholder,
+                        text: $viewModel.confirmPassword,
+                        isVisible: $isConfirmPasswordVisible,
+                        submitLabel: .go,
+                        showsValidationError: viewModel.confirmPasswordValidationMessage != nil
+                    )
+                    .focused($focusedField, equals: .confirmPassword)
+                    .onSubmit { viewModel.signUp() }
+                    .onChange(of: viewModel.confirmPassword) { _, _ in
+                        viewModel.clearConfirmPasswordValidation()
+                    }
+                }
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 10)

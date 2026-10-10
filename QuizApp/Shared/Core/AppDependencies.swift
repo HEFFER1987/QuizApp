@@ -27,8 +27,13 @@ enum AppDependencies {
         ProfileRepositoryMock()
     }
 
+    @MainActor
     static func makeResultsRepository() -> ResultsRepository {
-        ResultsRepositoryMock()
+        if AppStateManager.shared.isGuest {
+            GuestResultsRepository()
+        } else {
+            ResultsRepositoryMock()
+        }
     }
 
     static func makeExploreRepository() -> ExploreRepository {

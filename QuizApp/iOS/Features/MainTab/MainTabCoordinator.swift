@@ -5,6 +5,7 @@ protocol MainTabCoordinator {
     func showQuizBuilder() async
     func showQuizPlay(quizID: String) async
     func showResultDetail(_ result: QuizResult) async
+    func showLogin() async
 }
 
 class MainTabCoordinatorImpl: Coordinator<MainTabRoute>, MainTabCoordinator {
@@ -26,8 +27,14 @@ class MainTabCoordinatorImpl: Coordinator<MainTabRoute>, MainTabCoordinator {
     }
 
     func showQuizBuilder() async {
+        guard AppStateManager.shared.canAuthorQuizzes else { return }
         let coordinator = QuizBuilderCoordinatorImpl()
         await navigate(to: coordinator, presentationStyle: .push)
+    }
+
+    func showLogin() async {
+        let coordinator = LoginCoordinatorImpl()
+        await navigate(to: coordinator, presentationStyle: .fullScreenCover)
     }
 
     func showQuizPlay(quizID: String) async {
@@ -43,7 +50,8 @@ class MainTabCoordinatorImpl: Coordinator<MainTabRoute>, MainTabCoordinator {
     func makeQuizListViewModel() -> QuizListViewModelImpl {
         QuizListViewModelImpl(
             coordinator: quizListCoordinator,
-            quizRepository: AppDependencies.makeQuizRepository()
+            quizRepository: AppDependencies.makeQuizRepository(),
+            canAuthorQuizzes: AppStateManager.shared.canAuthorQuizzes
         )
     }
 
@@ -59,7 +67,8 @@ class MainTabCoordinatorImpl: Coordinator<MainTabRoute>, MainTabCoordinator {
             coordinator: profileCoordinator,
             profileRepository: AppDependencies.makeProfileRepository(),
             quizRepository: AppDependencies.makeQuizRepository(),
-            resultsRepository: AppDependencies.makeResultsRepository()
+            resultsRepository: AppDependencies.makeResultsRepository(),
+            isGuestSession: AppStateManager.shared.isGuest
         )
     }
 }

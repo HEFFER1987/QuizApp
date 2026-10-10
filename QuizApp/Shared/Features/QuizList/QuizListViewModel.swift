@@ -16,6 +16,7 @@ protocol QuizListViewModel: ObservableObject {
     var publishedCount: Int { get }
     var isLoading: Bool { get }
     var error: QuizListError? { get set }
+    var canAuthorQuizzes: Bool { get }
 
     func loadQuizzes() async
     func createQuiz()
@@ -30,6 +31,7 @@ final class QuizListViewModelImpl: QuizListViewModel {
 
     let coordinator: QuizListCoordinator
     private let quizRepository: QuizRepository
+    let canAuthorQuizzes: Bool
 
     @Published var filter: QuizListFilter = .all
     @Published var searchText: String = ""
@@ -58,10 +60,12 @@ final class QuizListViewModelImpl: QuizListViewModel {
 
     init(
         coordinator: QuizListCoordinator,
-        quizRepository: QuizRepository = QuizRepositoryMock()
+        quizRepository: QuizRepository = QuizRepositoryMock(),
+        canAuthorQuizzes: Bool = true
     ) {
         self.coordinator = coordinator
         self.quizRepository = quizRepository
+        self.canAuthorQuizzes = canAuthorQuizzes
     }
 
     func loadQuizzes() async {
@@ -78,6 +82,7 @@ final class QuizListViewModelImpl: QuizListViewModel {
     }
 
     func createQuiz() {
+        guard canAuthorQuizzes else { return }
         Task {
             await coordinator.showQuizBuilder()
         }
@@ -123,6 +128,7 @@ final class QuizListPreviewViewModel: QuizListViewModel {
     }
     var isLoading: Bool = false
     var error: QuizListError?
+    let canAuthorQuizzes: Bool = true
 
     init() {
         Task {
