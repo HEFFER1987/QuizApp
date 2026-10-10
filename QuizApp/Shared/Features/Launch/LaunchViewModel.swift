@@ -48,20 +48,22 @@ final class LaunchViewModelImpl: LaunchViewModel {
             hideLaunchContent()
             #endif
             #else
+            #if os(iOS)
+            if AppStateManager.shared.canAccessMainApp {
+                await coordinator.showMainApp()
+            } else {
+                await coordinator.showWelcome()
+            }
+            #else
             if AppStateManager.shared.authorizationState.isAuthorized {
                 await coordinator.showMainApp()
-                #if os(macOS)
                 hideLaunchContent()
-                #endif
             } else {
-                #if os(macOS)
                 let login = await coordinator.makeLoginCoordinator()
                 MacLaunchUIState.shared.presentLogin(with: login)
                 macLaunchContent = .hidden
-                #else
-                await coordinator.showLogin()
-                #endif
             }
+            #endif
             #endif
         } catch {
             print("Error starting timer: \(error)")

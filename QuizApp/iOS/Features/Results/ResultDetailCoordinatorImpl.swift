@@ -4,9 +4,11 @@ import SUICoordinator
 final class ResultDetailCoordinatorImpl: Coordinator<DefaultRoute>, ResultDetailCoordinator {
 
     private let resultId: String
+    private weak var mainTabCoordinator: MainTabCoordinatorImpl?
 
-    init(resultId: String) {
+    init(resultId: String, mainTabCoordinator: MainTabCoordinatorImpl? = nil) {
         self.resultId = resultId
+        self.mainTabCoordinator = mainTabCoordinator
         super.init()
     }
 
@@ -27,6 +29,6 @@ final class ResultDetailCoordinatorImpl: Coordinator<DefaultRoute>, ResultDetail
     }
 
     func retakeQuiz(title: String) async {
-        Logger.shared.log("Retake quiz tapped: \(title)", level: .info)
+        await mainTabCoordinator?.showQuizPlay(quizID: resultId)
     }
 }

@@ -114,6 +114,9 @@ private final class MacProfileInspectorPreviewViewModel: ProfileViewModel {
     var draftCount: Int { 0 }
     var publishedCount: Int { 0 }
     var shareText: String { "" }
+    let isGuestSession: Bool = false
+    var guestSummary: ResultsSummary?
+    var canPublishContent: Bool { true }
 
     init() {
         Task {
@@ -127,4 +130,5 @@ private final class MacProfileInspectorPreviewViewModel: ProfileViewModel {
     func openAllAchievements() {}
     func openResult(_ result: QuizResult) {}
     func openQuizMenu(_ quiz: Quiz) {}
+    func openRegistration() {}
 }

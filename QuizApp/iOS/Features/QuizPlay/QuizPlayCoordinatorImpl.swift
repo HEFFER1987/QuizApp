@@ -25,22 +25,12 @@ final class QuizPlayCoordinatorImpl: Coordinator<DefaultRoute>, QuizPlayCoordina
     }
 
     func showSessionResult(_ result: QuizPlaySessionResult) async {
+        let quizResult = result.makeQuizResult()
+        if AppStateManager.shared.isGuest {
+            GuestProgressStore.shared.append(quizResult)
+        }
         await finishFlow(animated: true)
-        await mainTabCoordinator?.showResultDetail(
-            QuizResult(
-                id: result.sessionID,
-                quizTitle: result.quizTitle,
-                iconName: result.iconName,
-                iconGlow: .blue,
-                completedAt: Date(),
-                correctCount: result.correctCount,
-                totalCount: result.totalCount,
-                durationSeconds: result.durationSeconds,
-                xpEarned: result.xpEarned,
-                scorePercent: result.scorePercent,
-                isComposite: false
-            )
-        )
+        await mainTabCoordinator?.showResultDetail(quizResult)
     }
 
     func dismiss() async {

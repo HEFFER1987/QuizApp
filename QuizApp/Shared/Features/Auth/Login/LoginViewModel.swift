@@ -3,6 +3,7 @@ import AuthenticationServices
 
 enum LoginError: Error {
     case emailEmpty
+    case emailInvalid
     case passwordEmpty
     case appleIDCredentialEmpty
     case rawNonceEmpty
@@ -16,8 +17,13 @@ enum LoginError: Error {
 protocol LoginViewModel: ObservableObject {
     var email: String { get set }
     var password: String { get set }
+    var emailValidationMessage: String? { get }
+    var passwordValidationMessage: String? { get }
     var isLoading: Bool { get }
     var error: LoginError? { get }
+
+    func clearEmailValidation()
+    func clearPasswordValidation()
 
     func login()
     func signUp()
@@ -44,15 +50,14 @@ final class LoginViewModelImpl: AuthViewModelBase, LoginViewModel {
     }
 
     func login() {
-        let email = self.email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let email = AuthCredentialsValidator.normalizedEmail(self.email)
         let password = self.password
+        let validation = AuthCredentialsValidator.validateLogin(email: self.email, password: password)
+        emailValidationMessage = validation.email
+        passwordValidationMessage = validation.password
 
-        guard !email.isEmpty else {
-            self.error = .emailEmpty
-            return
-        }
-        guard !password.isEmpty else {
-            self.error = .passwordEmpty
+        guard validation.isValid else {
+            self.error = AuthCredentialsValidator.loginError(email: self.email, password: password)
             return
         }
 
@@ -161,9 +166,11 @@ extension LoginError {
     var userMessage: String {
         switch self {
         case .emailEmpty:
-            return "Enter your email address."
+            return Strings.Auth.Validation.Email.empty
+        case .emailInvalid:
+            return Strings.Auth.Validation.Email.invalid
         case .passwordEmpty:
-            return "Enter your password."
+            return Strings.Auth.Validation.Password.empty
         case .appleIDCredentialEmpty, .rawNonceEmpty, .idTokenEmpty:
             return "Apple sign in failed. Please try again."
         case .accessTokenEmpty:

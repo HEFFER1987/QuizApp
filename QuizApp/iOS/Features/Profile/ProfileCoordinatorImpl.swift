@@ -25,4 +25,10 @@ final class ProfileCoordinatorImpl: ProfileCoordinator {
     func openAllAchievements() {
         Logger.shared.log("See all achievements tapped", level: .info)
     }
+
+    func openRegistration() {
+        Task {
+            await mainTabCoordinator?.showLogin()
+        }
+    }
 }

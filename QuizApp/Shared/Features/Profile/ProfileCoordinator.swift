@@ -5,4 +5,5 @@ protocol ProfileCoordinator {
     func openSettings()
     func openEditProfile()
     func openAllAchievements()
+    func openRegistration()
 }

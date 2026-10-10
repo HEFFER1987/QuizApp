@@ -179,6 +179,7 @@ struct MacGlassTextField: View {
     let systemImage: String
     @Binding var text: String
     var submitLabel: SubmitLabel = .next
+    var showsValidationError: Bool = false
     var onSubmit: () -> Void = {}
 
     var body: some View {
@@ -207,7 +208,10 @@ struct MacGlassTextField: View {
 
     private var fieldBorder: some View {
         RoundedRectangle(cornerRadius: 24, style: .continuous)
-            .stroke(QuizTheme.searchGlow.opacity(0.85), lineWidth: 1)
+            .stroke(
+                showsValidationError ? Color.red.opacity(0.9) : QuizTheme.searchGlow.opacity(0.85),
+                lineWidth: showsValidationError ? 1.5 : 1
+            )
     }
 }
 
@@ -216,6 +220,7 @@ struct MacGlassPasswordField: View {
     @Binding var text: String
     @Binding var isVisible: Bool
     var submitLabel: SubmitLabel = .go
+    var showsValidationError: Bool = false
     var onSubmit: () -> Void = {}
 
     var body: some View {
@@ -261,7 +266,10 @@ struct MacGlassPasswordField: View {
 
     private var fieldBorder: some View {
         RoundedRectangle(cornerRadius: 24, style: .continuous)
-            .stroke(QuizTheme.searchGlow.opacity(0.85), lineWidth: 1)
+            .stroke(
+                showsValidationError ? Color.red.opacity(0.9) : QuizTheme.searchGlow.opacity(0.85),
+                lineWidth: showsValidationError ? 1.5 : 1
+            )
     }
 }
 

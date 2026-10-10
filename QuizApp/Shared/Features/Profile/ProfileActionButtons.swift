@@ -3,8 +3,17 @@ import SwiftUI
 struct ProfileActionButtons: View {
     let shareText: String
     let onEdit: () -> Void
+    var showsPublishingActions: Bool = true
 
     var body: some View {
+        if !showsPublishingActions {
+            EmptyView()
+        } else {
+            publishingActions
+        }
+    }
+
+    private var publishingActions: some View {
         HStack(spacing: 12) {
             ShareLink(item: shareText) {
                 actionLabel(

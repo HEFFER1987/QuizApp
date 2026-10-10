@@ -55,35 +55,53 @@ struct MacSignUpView: View {
             }
 
             VStack(spacing: 14) {
-                MacGlassTextField(
-                    placeholder: Strings.Common.Email.placeholder,
-                    systemImage: "envelope",
-                    text: $viewModel.email,
-                    submitLabel: .next
-                ) {
-                    focusedField = .password
+                AuthFormValidatedField(validationMessage: viewModel.emailValidationMessage) {
+                    MacGlassTextField(
+                        placeholder: Strings.Common.Email.placeholder,
+                        systemImage: "envelope",
+                        text: $viewModel.email,
+                        submitLabel: .next,
+                        showsValidationError: viewModel.emailValidationMessage != nil
+                    ) {
+                        focusedField = .password
+                    }
+                    .focused($focusedField, equals: .email)
+                    .onChange(of: viewModel.email) { _, _ in
+                        viewModel.clearEmailValidation()
+                    }
                 }
-                .focused($focusedField, equals: .email)
 
-                MacGlassPasswordField(
-                    placeholder: Strings.Common.Password.placeholder,
-                    text: $viewModel.password,
-                    isVisible: $isPasswordVisible,
-                    submitLabel: .next
-                ) {
-                    focusedField = .confirmPassword
+                AuthFormValidatedField(validationMessage: viewModel.passwordValidationMessage) {
+                    MacGlassPasswordField(
+                        placeholder: Strings.Common.Password.placeholder,
+                        text: $viewModel.password,
+                        isVisible: $isPasswordVisible,
+                        submitLabel: .next,
+                        showsValidationError: viewModel.passwordValidationMessage != nil
+                    ) {
+                        focusedField = .confirmPassword
+                    }
+                    .focused($focusedField, equals: .password)
+                    .onChange(of: viewModel.password) { _, _ in
+                        viewModel.clearPasswordValidation()
+                    }
                 }
-                .focused($focusedField, equals: .password)
 
-                MacGlassPasswordField(
-                    placeholder: Strings.Signup.Confirm.Password.placeholder,
-                    text: $viewModel.confirmPassword,
-                    isVisible: $isConfirmPasswordVisible,
-                    submitLabel: .go
-                ) {
-                    viewModel.signUp()
+                AuthFormValidatedField(validationMessage: viewModel.confirmPasswordValidationMessage) {
+                    MacGlassPasswordField(
+                        placeholder: Strings.Signup.Confirm.Password.placeholder,
+                        text: $viewModel.confirmPassword,
+                        isVisible: $isConfirmPasswordVisible,
+                        submitLabel: .go,
+                        showsValidationError: viewModel.confirmPasswordValidationMessage != nil
+                    ) {
+                        viewModel.signUp()
+                    }
+                    .focused($focusedField, equals: .confirmPassword)
+                    .onChange(of: viewModel.confirmPassword) { _, _ in
+                        viewModel.clearConfirmPasswordValidation()
+                    }
                 }
-                .focused($focusedField, equals: .confirmPassword)
             }
 
             MacNeonPrimaryButton(

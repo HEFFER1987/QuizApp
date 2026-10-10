@@ -17,6 +17,7 @@ enum UnauthorizedReason: String, Codable, Equatable {
 
 enum UserAuthorizationState: Equatable, Codable {
     case authorized(userId: String, provider: AuthorizationProvider)
+    case guest
     case unauthorized(
         previousProvider: AuthorizationProvider?,
         previousUserId: String?,
@@ -30,11 +31,38 @@ enum UserAuthorizationState: Equatable, Codable {
         return false
     }
 
+    var isGuest: Bool {
+        if case .guest = self {
+            return true
+        }
+        return false
+    }
+
+    var isRegisteredUser: Bool {
+        isAuthorized
+    }
+
+    #if os(iOS)
+    var canAccessMainApp: Bool {
+        isAuthorized || isGuest
+    }
+    #endif
+
+    var canAuthorQuizzes: Bool {
+        isAuthorized
+    }
+
+    var canPublishContent: Bool {
+        isAuthorized
+    }
+
     /// Last sign-in method, available in both authorized and unauthorized states.
     var lastAuthorizationProvider: AuthorizationProvider? {
         switch self {
         case .authorized(_, let provider):
             return provider
+        case .guest:
+            return nil
         case .unauthorized(let previousProvider, _, _):
             return previousProvider
         }
@@ -44,6 +72,8 @@ enum UserAuthorizationState: Equatable, Codable {
         switch self {
         case .authorized(let userId, _):
             return userId
+        case .guest:
+            return nil
         case .unauthorized(_, let previousUserId, _):
             return previousUserId
         }
@@ -67,6 +97,33 @@ final class AppStateManager: ObservableObject {
         authorizationState = .authorized(userId: userId, provider: provider)
         persistState()
     }
+
+    func setGuest() {
+        authorizationState = .guest
+        persistState()
+    }
+
+    var isGuest: Bool {
+        authorizationState.isGuest
+    }
+
+    var isRegisteredUser: Bool {
+        authorizationState.isRegisteredUser
+    }
+
+    var canAuthorQuizzes: Bool {
+        authorizationState.canAuthorQuizzes
+    }
+
+    var canPublishContent: Bool {
+        authorizationState.canPublishContent
+    }
+
+    #if os(iOS)
+    var canAccessMainApp: Bool {
+        authorizationState.canAccessMainApp
+    }
+    #endif
 
     func setUnauthorized(reason: UnauthorizedReason) {
         let previousProvider = authorizationState.lastAuthorizationProvider

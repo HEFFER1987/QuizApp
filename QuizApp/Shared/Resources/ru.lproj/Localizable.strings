@@ -1,3 +1,22 @@
+"welcome.brand" = "QUIZ";
+"welcome.titlePrefix" = "Добро пожаловать в ";
+"welcome.titleAccent" = "QUIZ!";
+"welcome.subtitle" = "Исследуйте, учитесь и проходите увлекательные квизы.";
+"welcome.guest.title" = "Продолжить как гость";
+"welcome.guest.subtitle" = "Проходите квизы, смотрите результаты и изучайте публичный контент.";
+"welcome.guest.badge" = "Ограниченные функции";
+"welcome.account.title" = "Создать аккаунт";
+"welcome.account.subtitle" = "Создавайте квизы, делитесь ими и получите полный доступ ко всем функциям.";
+"welcome.account.badge" = "Полный доступ";
+"welcome.feature.takeQuizzes" = "Проходите чужие квизы";
+"welcome.feature.trackProgress" = "Отслеживайте прогресс";
+"welcome.feature.createShare" = "Создавайте и делитесь квизами";
+"profile.guest.title" = "Гостевой режим";
+"profile.guest.subtitle" = "Прогресс сохраняется на этом устройстве. Зарегистрируйтесь, чтобы создавать квизы и публиковать контент.";
+"profile.guest.register" = "Создать аккаунт";
+"profile.guest.emptyQuizzes" = "Создание квизов доступно после регистрации.";
+"profile.guest.statisticsTitle" = "Ваш локальный прогресс";
+
 "login.welcome.title" = "С возвращением!";
 "login.welcome.subtitle" = "Войдите в аккаунт и продолжите путь к знаниям";
 "login.continueWith" = "Или продолжить через";
@@ -19,6 +38,13 @@
 "common.email.placeholder" = "Эл. почта";
 "common.password.placeholder" = "Пароль";
 "common.action.signup" = "Регистрация";
+
+"auth.validation.email.empty" = "Введите адрес электронной почты.";
+"auth.validation.email.invalid" = "Введите корректный адрес электронной почты.";
+"auth.validation.password.empty" = "Введите пароль.";
+"auth.validation.password.tooShort" = "Пароль должен содержать не менее %d символов.";
+"auth.validation.confirmPassword.empty" = "Подтвердите пароль.";
+"auth.validation.password.mismatch" = "Пароли не совпадают.";
 "login.google.button" = "Войти через Google";
 "login.password.hide" = "Скрыть пароль";
 "login.password.show" = "Показать пароль";
@@ -89,4 +115,23 @@
 "profile.empty.favorites" = "Пока нет избранного";
 "profile.empty.history" = "Пока нет пройденных квизов";
 "profile.empty.quizzes" = "Нет квизов в этом фильтре";
+
+"quizPlay.submit" = "Ответить";
+"quizPlay.next" = "Далее";
+"quizPlay.loading" = "Загрузка квиза...";
+"quizPlay.error.title" = "Что-то пошло не так";
+"quizPlay.error.message" = "Не удалось загрузить квиз.";
+"quizPlay.error.retry" = "Повторить";
+"quizPlay.copyCode" = "Копировать код";
+"quizPlay.hints.title" = "ПОДСКАЗКИ";
+"quizPlay.hints.countLabel" = "Подсказки";
+"quizPlay.hints.fiftyFifty" = "50/50";
+"quizPlay.hints.audience" = "Помощь зала";
+"quizPlay.hints.extraTime" = "Доп. время";
+"quizPlay.complete.title" = "КВИЗ ЗАВЕРШЁН";
+"quizPlay.complete.greatJob" = "Отличная работа!";
+"quizPlay.complete.review" = "Разбор ответов";
+"quizPlay.complete.retry" = "Пройти снова";
+"quizPlay.complete.share" = "Поделиться";
+"quizPlay.complete.levelUp" = "Новый уровень → %d";
 

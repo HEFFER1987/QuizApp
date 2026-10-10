@@ -6,7 +6,17 @@ class AuthViewModelBase: ObservableObject {
 
     @Published var email: String = ""
     @Published var password: String = ""
+    @Published var emailValidationMessage: String?
+    @Published var passwordValidationMessage: String?
     @Published var isLoading: Bool = false
+
+    func clearEmailValidation() {
+        emailValidationMessage = nil
+    }
+
+    func clearPasswordValidation() {
+        passwordValidationMessage = nil
+    }
 
     init(
         authManager: AuthManager? = nil,

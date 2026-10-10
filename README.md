@@ -54,8 +54,8 @@ Re-run `./generate.sh` after changing `project.yml` or assets that SwiftGen trac
 For local UI work without Firebase config or network auth, use the **Debug-Mock** configuration (`MOCK_DATA` compile flag):
 
 1. Run `./generate.sh` after pulling changes to `project.yml`.
-2. In Xcode, select **`QuizApp-iOS-Mock`** or **`QuizApp-macOS-Mock`**.
-3. Run — Firebase is not configured, quiz/profile data comes from `*RepositoryMock`, and auth uses `AuthManagerMock`.
+2. **VS Code / SweetPad:** in [`.vscode/settings.json`](.vscode/settings.json) set `"quizApp.buildProfile": "mock"` (profiles live in `quizApp.buildProfiles`). Build & Run or the debug launch configs sync scheme/configuration automatically.
+3. **Xcode:** select **`QuizApp-iOS-Mock`** or **`QuizApp-macOS-Mock`**, then run — Firebase is not configured, quiz/profile data comes from `*RepositoryMock`, and auth uses `AuthManagerMock`.
 
 On first launch without a saved session, the app auto-signs in as `mock-user`. **Sign Out** in Settings shows Login; email/password sign-in uses mock auth. Google/Apple sign-in is unavailable in this build.
 

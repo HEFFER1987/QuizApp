@@ -4,6 +4,7 @@ struct CommonTextField: View {
     let placeholder: String
     @Binding var text: String
     var submitLabel: SubmitLabel = .done
+    var showsValidationError: Bool = false
 
     var body: some View {
         TextField(placeholder, text: $text)
@@ -16,7 +17,10 @@ struct CommonTextField: View {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(.black.opacity(0.06), lineWidth: 1)
+                    .stroke(
+                        showsValidationError ? Color.red.opacity(0.75) : .black.opacity(0.06),
+                        lineWidth: showsValidationError ? 1.5 : 1
+                    )
             )
             .shadow(color: .black.opacity(0.22), radius: 10, x: 0, y: 8)
     }

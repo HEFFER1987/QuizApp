@@ -60,6 +60,8 @@ final class MacProfileCoordinatorImpl: ProfileCoordinator {
             await macRootCoordinator?.showAchievements()
         }
     }
+
+    func openRegistration() {}
 }
 
 final class MacQuizBuilderCoordinatorImpl: QuizBuilderCoordinator {

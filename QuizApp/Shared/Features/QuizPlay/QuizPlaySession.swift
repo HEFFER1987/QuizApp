@@ -8,6 +8,7 @@ struct QuizPlayQuestion: Identifiable, Equatable {
     let correctOptionIDs: Set<String>
     let categoryLabel: String?
     let codeSnippet: String?
+    let explanation: String
 
     init(
         id: String,
@@ -16,7 +17,8 @@ struct QuizPlayQuestion: Identifiable, Equatable {
         type: QuizBuilderQuestionType,
         correctOptionIDs: Set<String>,
         categoryLabel: String? = nil,
-        codeSnippet: String? = nil
+        codeSnippet: String? = nil,
+        explanation: String = ""
     ) {
         self.id = id
         self.prompt = prompt
@@ -25,6 +27,7 @@ struct QuizPlayQuestion: Identifiable, Equatable {
         self.correctOptionIDs = correctOptionIDs
         self.categoryLabel = categoryLabel
         self.codeSnippet = codeSnippet
+        self.explanation = explanation
     }
 }
 
@@ -82,7 +85,8 @@ struct QuizPlayRepositoryMock: QuizPlayRepository {
             ],
             type: .singleChoice,
             correctOptionIDs: ["1a"],
-            categoryLabel: "Swift Basics"
+            categoryLabel: "Swift Basics",
+            explanation: "Правильный ответ: B\n[1, 2, 3] * 2 = [2, 4, 6]"
         ),
         QuizPlayQuestion(
             id: "2",
@@ -122,7 +126,8 @@ struct QuizPlayRepositoryMock: QuizPlayRepository {
             type: .singleChoice,
             correctOptionIDs: ["4b"],
             categoryLabel: "Swift Basics",
-            codeSnippet: mapCodeSnippet
+            codeSnippet: mapCodeSnippet,
+            explanation: "Correct answer: B — map doubles each element to [2, 4, 6]."
         ),
         QuizPlayQuestion(
             id: "5",
@@ -135,7 +140,8 @@ struct QuizPlayRepositoryMock: QuizPlayRepository {
             ],
             type: .multipleChoice,
             correctOptionIDs: ["5a", "5c"],
-            categoryLabel: "Types"
+            categoryLabel: "Types",
+            explanation: "struct и enum — value types; class и actor — reference types."
         ),
         QuizPlayQuestion(
             id: "6",

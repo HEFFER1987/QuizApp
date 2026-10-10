@@ -221,6 +221,9 @@ final class QuizBuilderViewModelImpl: QuizBuilderViewModel {
     func goNext() {
         guard canGoNext else { return }
         guard currentStep != .publish, let next = currentStep.next else { return }
+        if next == .publish, !AppStateManager.shared.canPublishContent {
+            return
+        }
         if next == .preview {
             resetPreviewSession()
         }
