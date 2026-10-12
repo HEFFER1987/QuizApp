@@ -6,4 +6,5 @@ protocol ProfileCoordinator {
     func openEditProfile()
     func openAllAchievements()
     func openRegistration()
+    func signOut()
 }

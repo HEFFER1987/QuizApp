@@ -31,4 +31,10 @@ final class ProfileCoordinatorImpl: ProfileCoordinator {
             await mainTabCoordinator?.showLogin()
         }
     }
+
+    func signOut() {
+        Task {
+            await mainTabCoordinator?.showWelcome()
+        }
+    }
 }

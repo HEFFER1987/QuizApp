@@ -135,6 +135,15 @@ struct MacProfileView<ViewModel: ProfileViewModel>: View {
                         onSeeAll: viewModel.openAllAchievements
                     )
                     ProfileActionButtons(shareText: viewModel.shareText, onEdit: viewModel.openEditProfile)
+
+                    if viewModel.canPublishContent {
+                        CommonButton(
+                            title: Strings.Profile.Action.signOut,
+                            background: Color.red.opacity(0.85),
+                            foreground: .white,
+                            action: viewModel.signOut
+                        )
+                    }
                 }
                 .padding(24)
             } else if viewModel.isLoading {

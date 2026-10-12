@@ -111,6 +111,7 @@
 "profile.filter.published" = "Опубликованные (%d)";
 "profile.action.share" = "Поделиться профилем";
 "profile.action.edit" = "Редактировать профиль";
+"profile.action.signOut" = "Выйти";
 "profile.shareText" = "%@ (%@) — Уровень %d · %d квизов пройдено";
 "profile.empty.favorites" = "Пока нет избранного";
 "profile.empty.history" = "Пока нет пройденных квизов";

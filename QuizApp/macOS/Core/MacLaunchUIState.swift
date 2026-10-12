@@ -28,6 +28,11 @@ final class MacLaunchUIState: ObservableObject {
         authScreen = .login(coordinator)
     }
 
+    func presentLoginAfterSignOut() {
+        mainCoordinator = nil
+        authScreen = .login(LoginCoordinatorImpl())
+    }
+
     func presentSignUp(with coordinator: SignUpCoordinatorImpl) {
         authScreen = .signup(coordinator)
     }

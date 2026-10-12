@@ -6,6 +6,7 @@ protocol MainTabCoordinator {
     func showQuizPlay(quizID: String) async
     func showResultDetail(_ result: QuizResult) async
     func showLogin() async
+    func showWelcome() async
 }
 
 class MainTabCoordinatorImpl: Coordinator<MainTabRoute>, MainTabCoordinator {
@@ -35,6 +36,11 @@ class MainTabCoordinatorImpl: Coordinator<MainTabRoute>, MainTabCoordinator {
     func showLogin() async {
         let coordinator = LoginCoordinatorImpl()
         await navigate(to: coordinator, presentationStyle: .fullScreenCover)
+    }
+
+    func showWelcome() async {
+        let coordinator = WelcomeCoordinatorImpl()
+        await navigate(to: coordinator, presentationStyle: .platformRootFlow)
     }
 
     func showQuizPlay(quizID: String) async {

@@ -44,6 +44,13 @@ struct ProfileView<ViewModel: ProfileViewModel>: View {
                             onEdit: viewModel.openEditProfile,
                             showsPublishingActions: viewModel.canPublishContent
                         )
+
+                        CommonButton(
+                            title: Strings.Profile.Action.signOut,
+                            background: Color.red.opacity(0.85),
+                            foreground: .white,
+                            action: viewModel.signOut
+                        )
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 8)

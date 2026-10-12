@@ -230,6 +230,7 @@
 "profile.filter.published" = "Published (%d)";
 "profile.action.share" = "Share profile";
 "profile.action.edit" = "Edit profile";
+"profile.action.signOut" = "Sign out";
 "profile.shareText" = "%@ (%@) — Level %d · %d quizzes completed";
 "profile.empty.favorites" = "No favorites yet";
 "profile.empty.history" = "No finished quizzes yet";

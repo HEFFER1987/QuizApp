@@ -62,6 +62,12 @@ final class MacProfileCoordinatorImpl: ProfileCoordinator {
     }
 
     func openRegistration() {}
+
+    func signOut() {
+        Task { @MainActor in
+            MacLaunchUIState.shared.presentLoginAfterSignOut()
+        }
+    }
 }
 
 final class MacQuizBuilderCoordinatorImpl: QuizBuilderCoordinator {

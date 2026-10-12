@@ -29,6 +29,7 @@ protocol ProfileViewModel: ObservableObject {
     func openResult(_ result: QuizResult)
     func openQuizMenu(_ quiz: Quiz)
     func openRegistration()
+    func signOut()
 }
 
 @MainActor
@@ -152,6 +153,12 @@ final class ProfileViewModelImpl: ProfileViewModel {
     func openRegistration() {
         coordinator.openRegistration()
     }
+
+    func signOut() {
+        guard !isGuestSession else { return }
+        AppStateManager.shared.setUnauthorized(reason: .signedOut)
+        coordinator.signOut()
+    }
 }
 
 final class ProfilePreviewViewModel: ProfileViewModel {
@@ -221,4 +228,5 @@ final class ProfilePreviewViewModel: ProfileViewModel {
     func openResult(_ result: QuizResult) {}
     func openQuizMenu(_ quiz: Quiz) {}
     func openRegistration() {}
+    func signOut() {}
 }

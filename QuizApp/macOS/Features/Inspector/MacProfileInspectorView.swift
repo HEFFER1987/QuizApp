@@ -39,6 +39,15 @@ struct MacProfileInspectorView<ViewModel: ProfileViewModel>: View {
                         onSeeAll: viewModel.openAllAchievements
                     )
                     MacMotivationCard()
+
+                    if viewModel.canPublishContent {
+                        CommonButton(
+                            title: Strings.Profile.Action.signOut,
+                            background: Color.red.opacity(0.85),
+                            foreground: .white,
+                            action: viewModel.signOut
+                        )
+                    }
                 } else if viewModel.isLoading {
                     SystemLoadingView(message: "Loading...")
                 }
@@ -131,4 +140,5 @@ private final class MacProfileInspectorPreviewViewModel: ProfileViewModel {
     func openResult(_ result: QuizResult) {}
     func openQuizMenu(_ quiz: Quiz) {}
     func openRegistration() {}
+    func signOut() {}
 }
