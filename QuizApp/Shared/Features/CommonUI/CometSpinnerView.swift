@@ -13,7 +13,6 @@ struct CometSpinnerView: View {
     var leadingGlow: Color = QuizTheme.publishedGlow
     var duration: Double = 1.0
 
-    @State private var isAnimating = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private static let defaultSpinnerDiameter: CGFloat = 64
@@ -66,101 +65,322 @@ struct CometSpinnerView: View {
         return backdropSide / Self.backdropScale()
     }
 
+    private func rotationDegrees(for date: Date) -> Double {
+        let cycles = date.timeIntervalSinceReferenceDate / duration
+        return cycles.truncatingRemainder(dividingBy: 1) * 360
+    }
+
+    @ViewBuilder
+    private func cometRings(
+        spinnerSize: CGFloat,
+        resolvedLine: CGFloat
+    ) -> some View {
+        ZStack {
+            Circle()
+                .stroke(
+                    AngularGradient(
+                        stops: [
+                            .init(color: trailingGlow.opacity(0), location: 0.0),
+                            .init(color: trailingGlow.opacity(0), location: 0.5),
+                            .init(color: trailingGlow.opacity(0), location: 0.6),
+                            .init(color: trailingGlow.opacity(0.15), location: 0.7),
+                            .init(color: trailingGlow, location: 1.0)
+                        ],
+                        center: .center,
+                        startAngle: .degrees(0),
+                        endAngle: .degrees(360)
+                    ),
+                    style: StrokeStyle(lineWidth: resolvedLine, lineCap: .round)
+                )
+                .cometSpinnerGlow(trailingGlow)
+
+            Circle()
+                .fill(trailingGlow)
+                .frame(width: resolvedLine, height: resolvedLine)
+                .cometSpinnerGlow(trailingGlow)
+                .offset(x: spinnerSize / 2)
+
+            Circle()
+                .stroke(
+                    AngularGradient(
+                        stops: [
+                            .init(color: leadingGlow.opacity(0), location: 0.0),
+                            .init(color: leadingGlow.opacity(0.1), location: 0.1),
+                            .init(color: leadingGlow.opacity(0.15), location: 0.2),
+                            .init(color: leadingGlow, location: 0.5),
+                            .init(color: leadingGlow.opacity(0), location: 0.5),
+                            .init(color: leadingGlow.opacity(0), location: 1.0)
+                        ],
+                        center: .center,
+                        startAngle: .degrees(0),
+                        endAngle: .degrees(360)
+                    ),
+                    style: StrokeStyle(lineWidth: resolvedLine, lineCap: .round)
+                )
+                .cometSpinnerGlow(leadingGlow)
+
+            Circle()
+                .fill(leadingGlow)
+                .frame(width: resolvedLine, height: resolvedLine)
+                .cometSpinnerGlow(leadingGlow)
+                .offset(x: -spinnerSize / 2)
+        }
+        .frame(width: spinnerSize, height: spinnerSize)
+    }
+
+    @ViewBuilder
+    private func spinnerStack(
+        spinnerSize: CGFloat,
+        resolvedLine: CGFloat,
+        solidRadius: CGFloat,
+        fadeEndRadius: CGFloat,
+        backdropSide: CGFloat,
+        rotationDegrees: Double
+    ) -> some View {
+        ZStack {
+            Circle()
+                .fill(Color.black)
+                .frame(width: backdropSide, height: backdropSide)
+                .mask(
+                    RadialGradient(
+                        colors: [.black, .clear],
+                        center: .center,
+                        startRadius: solidRadius,
+                        endRadius: fadeEndRadius
+                    )
+                )
+
+            cometRings(spinnerSize: spinnerSize, resolvedLine: resolvedLine)
+                .rotationEffect(.degrees(rotationDegrees))
+        }
+        .frame(width: backdropSide, height: backdropSide)
+    }
+
     var body: some View {
-        Color.clear
-            .aspectRatio(1, contentMode: .fit)
-            .frame(
-                minWidth: Self.defaultBackdropDiameter,
-                minHeight: Self.defaultBackdropDiameter
-            )
-            .overlay {
-                GeometryReader { geometry in
-                    let spinnerSize = spinnerDiameter(forContainerSize: geometry.size)
-                    let resolvedLine = resolvedLineWidth(for: spinnerSize)
-                    let solidRadius = backdropSolidRadius(for: spinnerSize)
-                    let fadeEndRadius = backdropFadeEndRadius(for: spinnerSize)
-                    let backdropSide = backdropDiameter(for: spinnerSize)
+        GeometryReader { geometry in
+            let spinnerSize = spinnerDiameter(forContainerSize: geometry.size)
+            let resolvedLine = resolvedLineWidth(for: spinnerSize)
+            let solidRadius = backdropSolidRadius(for: spinnerSize)
+            let fadeEndRadius = backdropFadeEndRadius(for: spinnerSize)
+            let backdropSide = backdropDiameter(for: spinnerSize)
 
-                    ZStack {
-                        Circle()
-                            .fill(Color.black)
-                            .frame(width: backdropSide, height: backdropSide)
-                            .mask(
-                                RadialGradient(
-                                    colors: [.black, .clear],
-                                    center: .center,
-                                    startRadius: solidRadius,
-                                    endRadius: fadeEndRadius
-                                )
+            Group {
+                #if os(macOS)
+                ZStack {
+                    Circle()
+                        .fill(Color.black)
+                        .frame(width: backdropSide, height: backdropSide)
+                        .mask(
+                            RadialGradient(
+                                colors: [.black, .clear],
+                                center: .center,
+                                startRadius: solidRadius,
+                                endRadius: fadeEndRadius
                             )
+                        )
 
-                        ZStack {
-                            Circle()
-                                .stroke(
-                                    AngularGradient(
-                                        stops: [
-                                            .init(color: trailingGlow.opacity(0), location: 0.0),
-                                            .init(color: trailingGlow.opacity(0), location: 0.5),
-                                            .init(color: trailingGlow.opacity(0), location: 0.6),
-                                            .init(color: trailingGlow.opacity(0.15), location: 0.7),
-                                            .init(color: trailingGlow, location: 1.0)
-                                        ],
-                                        center: .center,
-                                        startAngle: .degrees(0),
-                                        endAngle: .degrees(360)
-                                    ),
-                                    style: StrokeStyle(lineWidth: resolvedLine, lineCap: .round)
-                                )
-                                .shadow(color: trailingGlow.opacity(0.5), radius: 4)
-                                .shadow(color: trailingGlow, radius: 5)
-
-                            Circle()
-                                .fill(trailingGlow)
-                                .frame(width: resolvedLine, height: resolvedLine)
-                                .shadow(color: trailingGlow, radius: 5)
-                                .shadow(color: trailingGlow.opacity(0.5), radius: 4)
-                                .offset(x: spinnerSize / 2)
-
-                            Circle()
-                                .stroke(
-                                    AngularGradient(
-                                        stops: [
-                                            .init(color: leadingGlow.opacity(0), location: 0.0),
-                                            .init(color: leadingGlow.opacity(0), location: 0.1),
-                                            .init(color: leadingGlow.opacity(0.15), location: 0.2),
-                                            .init(color: leadingGlow, location: 0.5),
-                                            .init(color: leadingGlow.opacity(0), location: 0.5),
-                                            .init(color: leadingGlow.opacity(0), location: 1.0)
-                                        ],
-                                        center: .center,
-                                        startAngle: .degrees(0),
-                                        endAngle: .degrees(360)
-                                    ),
-                                    style: StrokeStyle(lineWidth: resolvedLine, lineCap: .round)
-                                )
-                                .shadow(color: leadingGlow.opacity(0.5), radius: 4)
-                                .shadow(color: leadingGlow, radius: 5)
-
-                            Circle()
-                                .fill(leadingGlow)
-                                .frame(width: resolvedLine, height: resolvedLine)
-                                .shadow(color: leadingGlow, radius: 5)
-                                .shadow(color: leadingGlow.opacity(0.5), radius: 4)
-                                .offset(x: -spinnerSize / 2)
-                        }
-                        .frame(width: spinnerSize, height: spinnerSize)
-                        .rotationEffect(.degrees(isAnimating ? 360 : 0))
-                    }
-                    .frame(width: backdropSide, height: backdropSide)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    CometSpinnerMacRotor(
+                        duration: duration,
+                        reduceMotion: reduceMotion,
+                        spinnerSize: spinnerSize,
+                        resolvedLine: resolvedLine,
+                        trailingGlow: trailingGlow,
+                        leadingGlow: leadingGlow
+                    )
+                    .frame(width: spinnerSize, height: spinnerSize)
                 }
-            }
-            .onAppear {
-                guard !reduceMotion else { return }
-                withAnimation(.linear(duration: duration).repeatForever(autoreverses: false)) {
-                    isAnimating = true
+                .frame(width: backdropSide, height: backdropSide)
+                #else
+                TimelineView(.animation(minimumInterval: 1.0 / 60.0, paused: reduceMotion)) { context in
+                    spinnerStack(
+                        spinnerSize: spinnerSize,
+                        resolvedLine: resolvedLine,
+                        solidRadius: solidRadius,
+                        fadeEndRadius: fadeEndRadius,
+                        backdropSide: backdropSide,
+                        rotationDegrees: rotationDegrees(for: context.date)
+                    )
                 }
+                #endif
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .aspectRatio(1, contentMode: .fit)
+        .frame(
+            minWidth: Self.defaultBackdropDiameter,
+            minHeight: Self.defaultBackdropDiameter
+        )
+    }
+}
+
+#if os(macOS)
+import AppKit
+
+private struct CometSpinnerMacRotorContent: View {
+    let spinnerSize: CGFloat
+    let resolvedLine: CGFloat
+    let trailingGlow: Color
+    let leadingGlow: Color
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(
+                    AngularGradient(
+                        stops: [
+                            .init(color: trailingGlow.opacity(0), location: 0.0),
+                            .init(color: trailingGlow.opacity(0), location: 0.5),
+                            .init(color: trailingGlow.opacity(0), location: 0.6),
+                            .init(color: trailingGlow.opacity(0.15), location: 0.7),
+                            .init(color: trailingGlow, location: 1.0)
+                        ],
+                        center: .center,
+                        startAngle: .degrees(0),
+                        endAngle: .degrees(360)
+                    ),
+                    style: StrokeStyle(lineWidth: resolvedLine, lineCap: .round)
+                )
+
+            Circle()
+                .fill(trailingGlow)
+                .frame(width: resolvedLine, height: resolvedLine)
+                .offset(x: spinnerSize / 2)
+
+            Circle()
+                .stroke(
+                    AngularGradient(
+                        stops: [
+                            .init(color: leadingGlow.opacity(0), location: 0.0),
+                            .init(color: leadingGlow.opacity(0.1), location: 0.1),
+                            .init(color: leadingGlow.opacity(0.15), location: 0.2),
+                            .init(color: leadingGlow, location: 0.5),
+                            .init(color: leadingGlow.opacity(0), location: 0.5),
+                            .init(color: leadingGlow.opacity(0), location: 1.0)
+                        ],
+                        center: .center,
+                        startAngle: .degrees(0),
+                        endAngle: .degrees(360)
+                    ),
+                    style: StrokeStyle(lineWidth: resolvedLine, lineCap: .round)
+                )
+
+            Circle()
+                .fill(leadingGlow)
+                .frame(width: resolvedLine, height: resolvedLine)
+                .offset(x: -spinnerSize / 2)
+        }
+        .frame(width: spinnerSize, height: spinnerSize)
+    }
+}
+
+private final class CometRotorContainerView: NSView {
+    private let hostingView: NSHostingView<CometSpinnerMacRotorContent>
+    var duration: Double
+    private var shouldSpin = true
+    private var didAttachLayerAnimation = false
+
+    init(content: CometSpinnerMacRotorContent, spinnerSize: CGFloat, duration: Double) {
+        self.duration = duration
+        hostingView = NSHostingView(rootView: content)
+        super.init(frame: NSRect(x: 0, y: 0, width: spinnerSize, height: spinnerSize))
+        hostingView.frame = bounds
+        hostingView.autoresizingMask = [.width, .height]
+        addSubview(hostingView)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func updateContent(_ content: CometSpinnerMacRotorContent) {
+        hostingView.rootView = content
+    }
+
+    func setSpinning(enabled: Bool) {
+        shouldSpin = enabled
+        if !enabled {
+            hostingView.layer?.removeAnimation(forKey: "cometSpin")
+            didAttachLayerAnimation = false
+            return
+        }
+        attachLayerAnimationIfNeeded()
+    }
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        attachLayerAnimationIfNeeded()
+    }
+
+    override func layout() {
+        super.layout()
+        hostingView.frame = bounds
+        guard let layer = hostingView.layer else { return }
+        layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        layer.position = CGPoint(x: bounds.midX, y: bounds.midY)
+    }
+
+    private func attachLayerAnimationIfNeeded() {
+        guard shouldSpin, window != nil, !didAttachLayerAnimation else { return }
+        hostingView.wantsLayer = true
+        guard let layer = hostingView.layer else { return }
+
+        layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        layer.position = CGPoint(x: bounds.midX, y: bounds.midY)
+
+        let animation = CABasicAnimation(keyPath: "transform.rotation.z")
+        animation.fromValue = 0
+        animation.toValue = -2 * Double.pi
+        animation.duration = duration
+        animation.repeatCount = .infinity
+        animation.isRemovedOnCompletion = false
+        layer.add(animation, forKey: "cometSpin")
+
+        didAttachLayerAnimation = true
+    }
+}
+
+/// AppKit layer animation — does not depend on SwiftUI body refresh per frame.
+private struct CometSpinnerMacRotor: NSViewRepresentable {
+    let duration: Double
+    let reduceMotion: Bool
+    let spinnerSize: CGFloat
+    let resolvedLine: CGFloat
+    let trailingGlow: Color
+    let leadingGlow: Color
+
+    func makeNSView(context: Context) -> CometRotorContainerView {
+        let view = CometRotorContainerView(
+            content: rotorContent,
+            spinnerSize: spinnerSize,
+            duration: duration
+        )
+        view.setSpinning(enabled: !reduceMotion)
+        return view
+    }
+
+    func updateNSView(_ nsView: CometRotorContainerView, context: Context) {
+        nsView.duration = duration
+        nsView.updateContent(rotorContent)
+        nsView.setSpinning(enabled: !reduceMotion)
+    }
+
+    private var rotorContent: CometSpinnerMacRotorContent {
+        CometSpinnerMacRotorContent(
+            spinnerSize: spinnerSize,
+            resolvedLine: resolvedLine,
+            trailingGlow: trailingGlow,
+            leadingGlow: leadingGlow
+        )
+    }
+}
+#endif
+
+private extension View {
+    @ViewBuilder
+    func cometSpinnerGlow(_ color: Color) -> some View {
+        shadow(color: color.opacity(0.5), radius: 4)
+            .shadow(color: color, radius: 5)
     }
 }
 
